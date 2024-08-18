@@ -31,3 +31,8 @@ body {
     text-wrap: balance;
   }
 }
+
+
+.testingclass {
+  @apply bg-white text-black text-balance p-4;
+}

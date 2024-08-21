@@ -84,3 +84,29 @@ export async function logout() {
     revalidatePath('/', 'layout')
     redirect('/')
 }
+
+export async function loginWithGoogle() {
+    const url = process.env.NEXT_URL || 'http://localhost:3000'
+    const supabase = createClient();
+    const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+            queryParams: {
+                access_type: 'offline',
+                prompt: 'consent',
+            },
+            redirectTo: `${url}/auth/callback`,
+        }
+    })
+
+    if (error) {
+        return {
+            message: 'Failed to sign in with Google',
+        }
+    }
+
+    if (data?.url) {
+        //Redirect URL
+        redirect(data.url)
+    }
+}

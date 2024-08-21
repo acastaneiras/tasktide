@@ -1,5 +1,5 @@
 'use client'
-import { signup } from '@/actions/AuthActions'
+import { loginWithGoogle, signup } from '@/actions/AuthActions'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
@@ -69,7 +69,7 @@ export default function SignUpPage() {
               </AlertDescription>
             </Alert>
           )}
-          <Button className='flex w-full justify-center gap-3'>
+          <Button className='flex w-full justify-center gap-3' onClick={() => loginWithGoogle()}>
             <Image src="/google_logo.png" alt="Google logo" width={20} height={20} />
             Continue with Google
           </Button>

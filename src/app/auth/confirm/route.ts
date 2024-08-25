@@ -21,7 +21,6 @@ export async function GET(request: NextRequest) {
       // redirect user to specified redirect URL or root of app
       redirect(next)
     }
-    console.log(error.message)
   }
 
   // redirect the user to an error page with some instructions

@@ -20,10 +20,13 @@ const signupSchema = z.object({
     message: 'Passwords do not match',
 })
 
-export async function login(prev: any, formData: object) {
-    const validatedFields = loginSchema.safeParse(formData)
-    //wait 3 seconds    
-    await new Promise(resolve => setTimeout(resolve, 3000))
+export async function login(prev: any, formData: FormData) {
+    const validatedFields = loginSchema.safeParse({
+        email: formData.get('email'),
+        password: formData.get('password'),
+    })
+    
+    await new Promise(resolve => setTimeout(resolve, 1000))
     //If the fields are not valid, return the errors
     if (!validatedFields.success) {
         return {
@@ -44,9 +47,13 @@ export async function login(prev: any, formData: object) {
 
 }
 
-export async function signup(prev: any, formData: object) {
-    const validatedFields = signupSchema.safeParse(formData)
-
+export async function signup(prev: any, formData: FormData) {
+    const validatedFields = loginSchema.safeParse({
+        email: formData.get('email'),
+        password: formData.get('password'),
+        displayName: formData.get('displayName'),
+        confirmPassword: formData.get('confirmPassword'),
+    });
     //If the fields are not valid, return the errors
     if (!validatedFields.success) {
         return {

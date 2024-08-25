@@ -1,5 +1,6 @@
 'use client'
 import { loginWithGoogle, signup } from '@/actions/AuthActions'
+import PendingButton from '@/components/custom/PendingButton'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
@@ -25,7 +26,6 @@ const schema = z.object({
 });
 
 export default function SignUpPage() {
-  const [isSubmitting, setIsSubmitting] = useState(false);
   //Generate a form with react-hook-form
   const form = useForm<z.infer<typeof schema>>({
     resolver: zodResolver(schema),
@@ -38,19 +38,8 @@ export default function SignUpPage() {
     }
   });
 
-  const { register, handleSubmit, formState: { errors, isValid } } = form;
-
   //Signup action
   const [state, formAction] = useFormState(signup, { success: false, message: '' })
-
-  //Validation before submitting the form
-  const handleSubmition: SubmitHandler<z.infer<typeof schema>> = async (data) => {
-    setIsSubmitting(true);
-    if (isValid) {
-      formAction(data);
-    }
-    setIsSubmitting(false);
-  };
 
   return (
     <Card className="w-full md:w-1/3">
@@ -81,7 +70,7 @@ export default function SignUpPage() {
           <div className="flex items-stretch justify-start h-[1px] border w-full"></div>
         </div>
         <Form {...form}>
-          <form className="grid w-full items-center gap-4" onSubmit={handleSubmit(handleSubmition)}>
+          <form className="grid w-full items-center gap-4" action={formAction}>
             <FormField
               control={form.control}
               name="displayName"
@@ -89,7 +78,7 @@ export default function SignUpPage() {
                 <FormItem className="flex flex-col space-y-1.5">
                   <FormLabel>Username</FormLabel>
                   <FormControl>
-                    <Input {...field} />
+                    <Input {...field} required />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -102,7 +91,7 @@ export default function SignUpPage() {
                 <FormItem className="flex flex-col space-y-1.5">
                   <FormLabel>Email</FormLabel>
                   <FormControl>
-                    <Input type="email" {...field} />
+                    <Input type="email" {...field} required />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -115,7 +104,7 @@ export default function SignUpPage() {
                 <FormItem className="flex flex-col space-y-1.5">
                   <FormLabel>Password</FormLabel>
                   <FormControl>
-                    <Input type="password" {...field} />
+                    <Input type="password" {...field} required />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -128,18 +117,13 @@ export default function SignUpPage() {
                 <FormItem className="flex flex-col space-y-1.5">
                   <FormLabel>Confirm Password</FormLabel>
                   <FormControl>
-                    <Input type="password" {...field} />
+                    <Input type="password" {...field} required />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
-            <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting &&
-                <Loader2 className="mr-2 h-4 w-4 animate-spin"></Loader2>
-              }
-              Sing up
-            </Button>
+            <PendingButton text="Sign up" />
           </form>
         </Form>
       </CardContent>

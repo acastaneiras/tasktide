@@ -1,5 +1,6 @@
 'use client'
 import { login, loginWithGoogle } from '@/actions/AuthActions'
+import PendingButton from '@/components/custom/PendingButton'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
@@ -10,7 +11,7 @@ import { Loader2, TriangleAlert } from "lucide-react"
 import Image from 'next/image'
 import Link from 'next/link'
 import { useState } from 'react'
-import { useFormState } from 'react-dom'
+import { useFormState, useFormStatus } from 'react-dom'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { z } from 'zod'
 
@@ -20,8 +21,6 @@ const schema = z.object({
 });
 
 export default function LoginPage() {
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
   //Generate a form with react-hook-form
   const form = useForm<z.infer<typeof schema>>({
     resolver: zodResolver(schema),
@@ -31,20 +30,9 @@ export default function LoginPage() {
       password: '',
     }
   });
-
-  const { register, handleSubmit, formState: { errors, isValid } } = form;
-
   //Login action
   const [state, formAction] = useFormState(login, { message: '' })
 
-  //Validation before submitting the form
-  const handleSubmition: SubmitHandler<z.infer<typeof schema>> = async (data) => {
-    setIsSubmitting(true);
-    if (isValid) {
-      formAction(data);
-    }
-    setIsSubmitting(false);
-  };
 
   return (
     <Card className="w-full md:w-1/3">
@@ -76,7 +64,7 @@ export default function LoginPage() {
           <div className="flex items-stretch justify-start h-[1px] border w-full"></div>
         </div>
         <Form {...form}>
-          <form className="grid w-full items-center gap-4" onSubmit={handleSubmit(handleSubmition)}>
+          <form className="grid w-full items-center gap-4" action={formAction}>
             <FormField
               control={form.control}
               name="email"
@@ -84,7 +72,7 @@ export default function LoginPage() {
                 <FormItem className="flex flex-col space-y-1.5">
                   <FormLabel>Email</FormLabel>
                   <FormControl>
-                    <Input type="email" {...field} />
+                    <Input type="email" {...field} required/>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -97,18 +85,13 @@ export default function LoginPage() {
                 <FormItem className="flex flex-col space-y-1.5">
                   <FormLabel>Password</FormLabel>
                   <FormControl>
-                    <Input type="password" {...field} />
+                    <Input type="password" {...field} required />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
-            <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting &&
-                <Loader2 className="mr-2 h-4 w-4 animate-spin"></Loader2>
-              }
-              Sing in
-            </Button>
+            <PendingButton text="Sign in"/>
           </form>
         </Form>
       </CardContent>

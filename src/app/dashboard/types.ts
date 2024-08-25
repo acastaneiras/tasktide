@@ -4,12 +4,12 @@ export interface Task {
     id: number;
     title: string;
     description: string;
-    column_id?: number;
-    start_date?: Dayjs ;
-    end_date: Dayjs;
+    columnId?: number;
+    startDate?: Dayjs ;
+    endDate: Dayjs;
     completed?: boolean;
-    created_at: string;
-    updated_at?: string;
+    created: string;
+    updated?: string;
     users: number[];
 }
 

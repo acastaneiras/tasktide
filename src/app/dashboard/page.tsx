@@ -8,6 +8,7 @@ import KanbanTask from '@/components/custom/kanban/KanbanTask'
 import { createClient } from '@/utils/supabase/client'
 import { useEffect, useMemo, useState } from 'react'
 import { Column, Task } from './types'
+import KanbanTaskCard from '@/components/custom/kanban/KanbanTaskCard'
 
 export default function TasksPage() {
   const supabase = createClient();
@@ -65,11 +66,11 @@ export default function TasksPage() {
       }
     }
 
-    const unassignedColumn = tasks.filter(task => !task.column_id)
+    const unassignedColumn = tasks.filter(task => !task.columnId)
 
 
     const taskColumns = columns.map(column => {
-      const columnTasks = tasks.filter(task => task?.column_id === column.id)
+      const columnTasks = tasks.filter(task => task?.columnId === column.id)
       return {
         ...column,
         tasks: columnTasks
@@ -95,7 +96,7 @@ export default function TasksPage() {
           <KanbanColumn id="unassigned" title={"Unassigned"} count={taskColumns.unassignedColumn.length || 0} onAddClick={() => handleAddTask({ columnId: 'unassigned' })}>
             {taskColumns.unassignedColumn.map(task => (
               <KanbanTask key={task.id} id={task.id} data={{ ...task, columnId: 'unassigned' }} >
-                {task.title}
+                <KanbanTaskCard {...task} />
               </KanbanTask>
             ))}
           </KanbanColumn>

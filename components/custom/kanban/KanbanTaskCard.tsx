@@ -1,7 +1,8 @@
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
+import { ScrollArea } from '@/components/ui/scroll-area'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { cn } from '@/lib/utils'
 import { Task } from '@/types'
@@ -12,7 +13,7 @@ import { memo, useMemo } from 'react'
 
 type BadgeTypes = "default" | "secondary" | "destructive" | "outline" | "warning" | "success" | "error" | null | undefined;
 
-const KanbanTaskCard = ({ id, title, startDate, endDate, users }: Task) => {
+const KanbanTaskCard = ({ id, title, startDate, endDate, description, users }: Task) => {
 
     const editTask = () => { };
     const dropdownItems = useMemo(() => {
@@ -58,10 +59,10 @@ const KanbanTaskCard = ({ id, title, startDate, endDate, users }: Task) => {
 
 
     return (
-        <Card className="w-full" onClick={() => editTask}>
-            <CardHeader className='pt-3'>
-                <CardTitle className="flex align-center justify-between">
-                    <TooltipProvider>
+        <TooltipProvider>
+            <Card className="w-full" onClick={() => editTask}>
+                <CardHeader className='p-3'>
+                    <CardTitle className="flex align-center justify-between">
                         <Tooltip>
                             <TooltipTrigger asChild>
                                 <span className="truncate text-lg items-center  flex">{title}</span>
@@ -70,42 +71,57 @@ const KanbanTaskCard = ({ id, title, startDate, endDate, users }: Task) => {
                                 {title}
                             </TooltipContent>
                         </Tooltip>
-                    </TooltipProvider>
-                    <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" className='rounded-lg ring-offset-0 focus-visible:ring-0 focus-visible:ring-offset-0'><EllipsisVertical className='w-4 h-4' /></Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent>
-                            <DropdownMenuGroup>
-                                {dropdownItems.map(item => (
-                                    <DropdownMenuItem key={item.label} onPointerDown={(e) => { e.stopPropagation() }} onClick={(event) => {
-                                        event.stopPropagation()
-                                        event.preventDefault()
-                                        item.onClick
-                                    }} 
-                                    className={cn(item.classes, "flex items-center cursor-pointer gap-2")}>
-                                        {item.icon}
-                                        <span>{item.label}</span>
-                                    </DropdownMenuItem>
-                                ))}
-                            </DropdownMenuGroup>
-                        </DropdownMenuContent>
-                    </DropdownMenu>
-                </CardTitle>
-                <CardDescription className='flex flex-wrap items-center gap-2'>
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <Button variant="ghost" className='rounded-lg ring-offset-0 focus-visible:ring-0 focus-visible:ring-offset-0'><EllipsisVertical className='w-4 h-4' /></Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent>
+                                <DropdownMenuGroup>
+                                    {dropdownItems.map(item => (
+                                        <DropdownMenuItem key={item.label} onPointerDown={(e) => { e.stopPropagation() }} onClick={(event) => {
+                                            event.stopPropagation()
+                                            event.preventDefault()
+                                            item.onClick
+                                        }}
+                                            className={cn(item.classes, "flex items-center cursor-pointer gap-2")}>
+                                            {item.icon}
+                                            <span>{item.label}</span>
+                                        </DropdownMenuItem>
+                                    ))}
+                                </DropdownMenuGroup>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+                    </CardTitle>
+                </CardHeader>
+                <hr />
+                {description && <CardContent className='p-3'>
+                    {
+                        description.length >= 60 ? (
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <p className="line-clamp-2">{description}</p>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                    <ScrollArea className='h-[150px] rounded-md p-4 text-pretty text-md'>
+                                        {description}
+                                    </ScrollArea>
+                                </TooltipContent>
+                            </Tooltip>
+                        ) : (
+                            <p className='line-clamp-2'>{description}</p>
+                        )
+                    }
+                </CardContent>}
 
-                </CardDescription>
-            </CardHeader>
-            <CardContent>
-            </CardContent>
-            <CardFooter className="flex justify-between items-center gap-2">
-                {dateConfig && (
-                    <Badge variant={dateConfig.color} className='flex gap-1 text-xs'><Clock className='w-4 h-4' /> {dateConfig.text}</Badge>
-                )}
+                <CardFooter className="flex justify-between items-center gap-2 p-3">
+                    {dateConfig && (
+                        <Badge variant={dateConfig.color} className='flex gap-1 text-xs'><Clock className='w-4 h-4' /> {dateConfig.text}</Badge>
+                    )}
 
-                {/*ToDo - Users assigned*/}
-            </CardFooter>
-        </Card>
+                    {/*ToDo - Users assigned*/}
+                </CardFooter>
+            </Card>
+        </TooltipProvider>
     )
 }
 

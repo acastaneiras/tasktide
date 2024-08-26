@@ -4,20 +4,30 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel,
 import { createClient } from '@/utils/supabase/server'
 import Image from 'next/image'
 import { redirect } from 'next/navigation'
+import { userAgent } from 'next/server'
 import React from 'react'
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
     let isOauthUser = false
     const supabase = createClient()
-
-    const { data, error } = await supabase.auth.getUser()
+    //UNCOMMENT THIS ON PRODUCTION
+    /*const { data, error } = await supabase.auth.getUser()
     if (error || !data?.user) {
         redirect('/sign-in')
     } else if (data?.user.app_metadata.providers.includes('google')) {
         isOauthUser = true
+    }*/
+    const data = {
+        user: {
+            email: 'test',
+            user_metadata: {
+                name: 'Test User',
+                picture: 'https://www.gravatar.com/avatar/205e460b479e2e5b48aec07710c08d50'
+            }
+        }
     }
     return (
-        <main className='overflow-hidden rounded-[0.5rem] bg-background shadow h-full'>
+        <main className='overflow-hidden rounded-[0.5rem] bg-background h-full'>
             <div className="flex flex-col h-full">
                 <div className="border-b">
                     <div className="flex h-16 items-center px-4">
@@ -26,7 +36,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
                             <div className="flex justify-end">
                                 <DropdownMenu>
                                     <DropdownMenuTrigger className="flex items-center space-x-2 ring-offset-0 focus-visible:ring-0 focus-visible:ring-offset-0" asChild>
-                                        <Button variant='link' className='hover:no-underline no-underline ring-offset-0 ring-offset-0 focus-visible:ring-0 focus-visible:ring-offset-0'>
+                                        <Button variant='link' className='hover:no-underline no-underline ring-offset-0 focus-visible:ring-0 focus-visible:ring-offset-0'>
                                             {
                                                 isOauthUser && <Image src={data.user.user_metadata.picture} alt="avatar" className="w-8 h-8 rounded-full" width={20} height={20} />
                                             }

@@ -15,7 +15,7 @@ const KanbanTask = ({children, id, data}: React.PropsWithChildren<Props>) => {
     return (
         <div className='relative'>
             <div ref={setNodeRef} {...attributes} {...listeners} className={cn("rounded-lg relative cursor-grab", active ? (active.id === id ? "opacity-100" : "opacity-50") : "opacity-100")}>
-                {active?.id === id && <DragOverlay zIndex={999}>
+                {active?.id === id && <DragOverlay zIndex={30}>
                     <div className='rounded-lg shadow-lg cursor-grabbing'>
                         {children}
                     </div>

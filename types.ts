@@ -6,15 +6,15 @@ export interface Task {
     description: string;
     columnId?: number;
     startDate?: Dayjs ;
-    endDate: Dayjs;
+    endDate?: Dayjs;
     completed?: boolean;
     created: string;
     updated?: string;
-    users: number[];
+    users: any[];
 }
 
 export interface Column {
-    id: number;
+    id: number | null;
     title: string;
-    icon?: string;
+    icon?: any;
 }

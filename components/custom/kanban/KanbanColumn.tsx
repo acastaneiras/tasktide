@@ -24,7 +24,7 @@ const KanbanColumn = ({ children, id, title, description, count, data, onAddClic
   }
   return (
     <div ref={setNodeRef} className='flex flex-col px-4 md:max-w-xl w-full'>
-      <div className='py-3'>
+      <div className='py-3 px-4'>
         <div className='flex justify-between w-full'>
           <TooltipProvider>
             <Tooltip>
@@ -47,7 +47,7 @@ const KanbanColumn = ({ children, id, title, description, count, data, onAddClic
         </div>
         <p className='text-sm'>{description}</p>
       </div>
-      <div className={cn('flex-1 rounded border-dashed border-2 border-transparent', over ? 'overflow-y-hidden' : 'overflow-y-scroll', isOver ? 'border-primary/60' : 'border-transparent')}>
+      <div className={cn('flex-1 rounded border-dashed border-2 border-transparent px-4', over ? 'overflow-y-hidden' : 'overflow-y-scroll', isOver ? 'border-primary/60' : 'border-transparent')}>
         <div className='flex flex-col mt-3 gap-2'>{children}</div>
       </div>
     </div>

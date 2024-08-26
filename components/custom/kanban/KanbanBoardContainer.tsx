@@ -1,11 +1,13 @@
+import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
 import React from 'react'
 
-const KanbanBoardContainer = ({children} : React.PropsWithChildren) => {
+const KanbanBoardContainer = ({ children }: React.PropsWithChildren) => {
   return (
     <div className='relative flex flex-col w-full h-full'>
-        <div className='w-full h-full flex p-8 overflow-x-scroll'>
-            {children}
-        </div>
+      <ScrollArea className='w-full h-full flex p-8'>
+          {children}
+        <ScrollBar orientation='horizontal' />
+      </ScrollArea>
     </div>
   )
 }

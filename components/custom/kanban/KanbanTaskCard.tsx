@@ -1,6 +1,8 @@
+import { deleteTask } from '@/actions/DashboardActions'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
+import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
@@ -16,6 +18,11 @@ type BadgeTypes = "default" | "secondary" | "destructive" | "outline" | "warning
 const KanbanTaskCard = ({ id, title, startDate, endDate, description, users }: Task) => {
 
     const editTask = () => { };
+    const handleRemoveTask = async () => {
+        deleteTask(id);
+    };
+        
+        
     const dropdownItems = useMemo(() => {
         return [
             {
@@ -71,26 +78,41 @@ const KanbanTaskCard = ({ id, title, startDate, endDate, description, users }: T
                                 {title}
                             </TooltipContent>
                         </Tooltip>
-                        <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                                <Button variant="ghost" className='rounded-lg ring-offset-0 focus-visible:ring-0 focus-visible:ring-offset-0'><EllipsisVertical className='w-4 h-4' /></Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent>
-                                <DropdownMenuGroup>
-                                    {dropdownItems.map(item => (
-                                        <DropdownMenuItem key={item.label} onPointerDown={(e) => { e.stopPropagation() }} onClick={(event) => {
-                                            event.stopPropagation()
-                                            event.preventDefault()
-                                            item.onClick
-                                        }}
-                                            className={cn(item.classes, "flex items-center cursor-pointer gap-2")}>
-                                            {item.icon}
-                                            <span>{item.label}</span>
-                                        </DropdownMenuItem>
-                                    ))}
-                                </DropdownMenuGroup>
-                            </DropdownMenuContent>
-                        </DropdownMenu>
+                        <Dialog>
+
+                            <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                    <Button variant="ghost" className='rounded-lg ring-offset-0 focus-visible:ring-0 focus-visible:ring-offset-0'><EllipsisVertical className='w-4 h-4' /></Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent>
+                                    <DropdownMenuGroup>
+                                        {dropdownItems.map(item => (
+                                            <DialogTrigger key={item.label} asChild onClick={() => console.log(item)}>
+                                                <DropdownMenuItem onPointerDown={(e) => { e.stopPropagation() }}
+                                                    className={cn(item.classes, "flex items-center cursor-pointer gap-2")}>
+                                                    {item.icon}
+                                                    <span>{item.label}</span>
+                                                </DropdownMenuItem>
+                                            </DialogTrigger>
+                                        ))}
+                                    </DropdownMenuGroup>
+                                </DropdownMenuContent>
+                            </DropdownMenu>
+                            <DialogContent>
+                                <DialogHeader>
+                                    <DialogTitle>Are you sure you want to delete this task?</DialogTitle>
+                                </DialogHeader>
+                                <DialogDescription></DialogDescription>
+                                <DialogFooter>
+                                    <DialogClose asChild>
+                                        <Button variant='destructive' onClick={handleRemoveTask}>Delete</Button>
+                                    </DialogClose>
+                                    <DialogClose asChild>
+                                        <Button variant='outline'>Cancel</Button>
+                                    </DialogClose>
+                                </DialogFooter>
+                            </DialogContent>
+                        </Dialog>
                     </CardTitle>
                 </CardHeader>
                 <hr />

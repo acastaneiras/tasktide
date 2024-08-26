@@ -9,3 +9,13 @@ export async function addOrUpdateTask(task: Task) {
         .upsert(task);
     return { data, error }
 }
+
+export async function deleteTask(taskId: number) {
+    const supabase = createClient();
+    const { data, error } = await supabase
+        .from('tasks')
+        .delete()
+        .eq('id', taskId);
+        console.log(error, data)
+    return { data, error }
+}

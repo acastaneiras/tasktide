@@ -8,7 +8,7 @@ export const kanbanColumns = [
     },
     {
         id: 2,
-        title: "In Progress",
+        title: "Working",
         icon: Eye,
     },
     {

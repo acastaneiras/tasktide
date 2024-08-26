@@ -32,8 +32,6 @@ export default function TasksPage() {
         .select('*')
       const tasks = data as Task[]
       setTasks(tasks)
-
-      await new Promise(resolve => setTimeout(resolve, 1000))
       setLoading(false)
     }
 
@@ -90,7 +88,6 @@ export default function TasksPage() {
           {columns.map(column => (
             <KanbanColumnSkeleton key={column.id} />
           ))}
-
         </KanbanBoardContainer>
       </section>
     )

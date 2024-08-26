@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
 import { useDroppable, UseDroppableArguments } from '@dnd-kit/core';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { CirclePlus } from 'lucide-react';
 import React from 'react';
 
@@ -39,17 +40,15 @@ const KanbanColumn = ({ children, id, title, description, count, data, onAddClic
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
-
-
           <Button variant="none" onClick={handleAddClick}>
             <CirclePlus className='h-6 w-6' />
           </Button>
         </div>
         <p className='text-sm'>{description}</p>
       </div>
-      <div className={cn('flex-1 rounded border-dashed border-2 border-transparent px-4', over ? 'overflow-y-hidden' : 'overflow-y-scroll', isOver ? 'border-primary/60' : 'border-transparent')}>
+      <ScrollArea className={cn('flex-1 rounded border-dashed border-2 border-transparent px-4 h-full pb-10', isOver ? 'border-primary/60' : 'border-transparent')}>
         <div className='flex flex-col mt-3 gap-2'>{children}</div>
-      </div>
+      </ScrollArea>
     </div>
   )
 }

@@ -1,3 +1,4 @@
+'use client'
 import { deleteTask } from '@/actions/DashboardActions'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -12,14 +13,19 @@ import { getDateColor, getDateText } from '@/utils/functions'
 import dayjs from 'dayjs'
 import { Clock, EllipsisVertical, Eye, Pencil, Trash } from 'lucide-react'
 import { memo, useMemo } from 'react'
-
+import { toast } from "sonner"
 type BadgeTypes = "default" | "secondary" | "destructive" | "outline" | "warning" | "success" | "error" | null | undefined;
 
 const KanbanTaskCard = ({ id, title, startDate, endDate, description, users }: Task) => {
 
     const editTask = () => { };
     const handleRemoveTask = async () => {
-        deleteTask(id);
+        const { error } = await deleteTask(id);
+        if (error) {
+            toast.error('Error deleting task');
+        } else {
+            toast.success('Task deleted successfully')
+        }
     };
         
         
@@ -29,12 +35,6 @@ const KanbanTaskCard = ({ id, title, startDate, endDate, description, users }: T
                 label: 'View task',
                 icon: <Eye className='w-4 h-4' />,
                 onClick: (e: any) => { e.stopPropagation() },
-                classes: 'text-primary'
-            },
-            {
-                label: 'Edit task',
-                icon: <Pencil className='w-4 h-4' />,
-                onClick: () => { },
                 classes: 'text-primary'
             },
             {
@@ -79,7 +79,6 @@ const KanbanTaskCard = ({ id, title, startDate, endDate, description, users }: T
                             </TooltipContent>
                         </Tooltip>
                         <Dialog>
-
                             <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
                                     <Button variant="ghost" className='rounded-lg ring-offset-0 focus-visible:ring-0 focus-visible:ring-offset-0'><EllipsisVertical className='w-4 h-4' /></Button>

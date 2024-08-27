@@ -75,3 +75,9 @@
     @apply bg-background text-foreground;
   }
 }
+
+/*Custom CSS */
+.horizontal-scroll > div {
+  display: flex !important;
+  height: 100%;
+}

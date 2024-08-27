@@ -2,12 +2,13 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { cn } from "@/lib/utils";
+import { Toaster } from "@/components/ui/sonner"
 
 const inter = Inter({ subsets: ["latin"] });
 
 
 export const metadata: Metadata = {
-  title: "TaskTide", 
+  title: "TaskTide",
   description: "A Kanban board app built with Next.js and Tailwind CSS using TypeScript and Supabase.",
 };
 
@@ -18,7 +19,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={cn(`${inter.className} dark flex flex-col h-screen`)}>{children}</body>
+      <body className={cn(`${inter.className} dark flex flex-col h-screen`)}>
+        {children}
+        <Toaster />
+      </body>
     </html>
   );
 }

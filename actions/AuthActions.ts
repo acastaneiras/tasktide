@@ -83,7 +83,7 @@ export async function logout() {
     const supabase = createClient()
 
     const { error } = await supabase.auth.signOut()
-
+    console.log('yepaaa')
     if (error) {
         redirect('/error')
     }

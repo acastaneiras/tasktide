@@ -43,6 +43,12 @@ export const useKanbanStore = create<KanbanState>()(
                         default:
                             break;
                     }
+                    
+                    updatedTasks.sort((a, b) => {
+                        if (!a.endDate) return 1;
+                        if (!b.endDate) return -1;
+                        return a.endDate!.diff(b.endDate!);
+                    });
 
                     set({ tasks: updatedTasks });
                 },

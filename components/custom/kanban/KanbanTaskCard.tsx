@@ -15,7 +15,7 @@ import { memo, useMemo } from 'react'
 
 type BadgeTypes = "default" | "secondary" | "destructive" | "outline" | "warning" | "success" | "error" | null | undefined;
 
-const KanbanTaskCard = ({ id, title, startDate, endDate, description, users, created }: Task) => {
+const KanbanTaskCard = ({ id, title, startDate, endDate, description, completed, completedDate,  users, created }: Task) => {
     const { setIsDeleteDialogOpen, setIsEditDialogOpen, setSelectedTaskId } = useKanbanStore();
 
     const dropdownItems = useMemo(() => {
@@ -46,6 +46,8 @@ const KanbanTaskCard = ({ id, title, startDate, endDate, description, users, cre
         if (startDate) {
             start = dayjs(startDate);
         }
+
+        if (completed && completedDate !== null) return { color: "success" as BadgeTypes, text: getDateText({ start, end, completedDate }) };
 
         return {
             color: end ? getDateColor({ date: end.toISOString() }) as BadgeTypes : "outline",

@@ -13,6 +13,7 @@ export interface Task {
     created: string;
     updated?: string;
     users: any[];
+    completedDate: Dayjs | null;
 }
 
 export interface Column {

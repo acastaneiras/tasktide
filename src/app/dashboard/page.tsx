@@ -31,12 +31,14 @@ export default function TasksPage() {
       setLoading(true);
       const { data } = await supabase
         .from('tasks')
-        .select('*');
+        .select('*')
+        .order('endDate', { ascending: true });
 
       const tasks = (data as Task[]).map(task => ({
         ...task,
         startDate: task.startDate ? dayjs(task.startDate) : undefined,
         endDate: task.endDate ? dayjs(task.endDate) : undefined,
+        completedDate: task.completedDate ? dayjs(task.completedDate) : null
       }));
       setTasks(tasks);
       setLoading(false);
@@ -58,9 +60,7 @@ export default function TasksPage() {
 
           newTask.startDate = newTask.startDate ? dayjs(newTask.startDate) : undefined;
           newTask.endDate = newTask.endDate ? dayjs(newTask.endDate) : undefined;
-          oldTask.startDate = oldTask.startDate ? dayjs(oldTask.startDate) : undefined;
-          oldTask.endDate = oldTask.endDate ? dayjs(oldTask.endDate) : undefined;
-
+          newTask.completedDate = newTask.completedDate ? dayjs(newTask.completedDate) : null;
 
           changeTask(eventType, newTask as Task, oldTask as Task);
         }
@@ -116,11 +116,13 @@ export default function TasksPage() {
     //Check if the task is being moved to the completed column
     if (parseInt(columnId!) === COMPLETED_COLUMN) {
       updatedTask.completed = true;
+      updatedTask.completedDate = dayjs();
     } else {
       updatedTask.completed = false;
+      updatedTask.completedDate = null;
     }
     updatedTasks[taskIndex] = updatedTask;
-    
+
     setTasks(updatedTasks);
     let { error } = await addOrUpdateTask(updatedTask);
     //If there is an error, revert the changes
@@ -146,12 +148,14 @@ export default function TasksPage() {
   if (loading) {
     return (
       <section className='h-full flex-1'>
-        <KanbanBoardContainer>
-          <KanbanColumnSkeleton />
-          {columns.map(column => (
-            <KanbanColumnSkeleton key={column.id} />
-          ))}
-        </KanbanBoardContainer>
+          <div className='relative flex flex-col w-full h-full'>
+            <div className='w-full h-[100%] flex flex-row p-8 overflow-x-auto horizontal-scroll'>
+              <KanbanColumnSkeleton />
+              {columns.map(column => (
+                <KanbanColumnSkeleton key={column.id} />
+              ))}
+            </div>
+          </div>
       </section>
     )
   }

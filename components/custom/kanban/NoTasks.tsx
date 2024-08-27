@@ -6,7 +6,7 @@ const NoTasks = () => {
     return (
         <Alert>
             <BadgeInfoIcon className="h-5 w-5" />
-            <AlertTitle>No tasks!</AlertTitle>
+            <AlertTitle>No tasks</AlertTitle>
             <AlertDescription>
                 Create a new task by clicking the button next to the title of the column
             </AlertDescription>

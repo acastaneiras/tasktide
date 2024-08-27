@@ -103,6 +103,7 @@ const EditTaskDialog = ({ open, onClose }: EditTaskDialogProps) => {
             description: data.description || '',
             startDate: data.startDate ? dayjs(data.startDate).toISOString() : undefined,
             endDate: data.endDate ? dayjs(data.endDate).toISOString() : undefined,
+            completedDate: (completed && task.completedDate === null) ? dayjs().toISOString() : null,
             completed: data.completed,
             columnId: data.columnId === null ? null : Number(data.columnId),
         };

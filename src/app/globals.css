@@ -87,14 +87,14 @@
   :root {
     --warning: 38 92% 50%;
     --warning-foreground: 48 96% 89%;
-    --success: 38 92% 50%;
-    --success-foreground: 48 96% 89%;
+    --success: 144, 78%, 36%;
+    --success-foreground: 144 88% 53%;
   }
 
   .dark {
     --success: 38 92% 50%;
     --success-foreground: 48 96% 89%;
-    --warning: 38 92% 50%;
-    --warning-foreground: 48 96% 89%;
+    --success: 144, 78%, 36%;
+    --success-foreground: 144 88% 53%;
   }
 }

@@ -29,7 +29,7 @@ const KanbanColumn = ({ children, id, title, description, count, data, onAddClic
   const Icon = column?.icon || CircleHelp;
 
   return (
-    <div ref={setNodeRef} className='flex flex-col px-4 md:max-w-xl w-full'>
+    <div ref={setNodeRef} className='flex flex-col px-4 md:max-w-xl min-w-80 w-full'>
       <div className='py-3 px-4'>
         <div className='flex justify-between w-full'>
           <TooltipProvider>

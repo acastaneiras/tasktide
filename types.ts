@@ -4,8 +4,8 @@ export interface Task {
     id: number;
     title: string;
     description: string;
-    columnId?: number;
-    startDate?: Dayjs ;
+    columnId?: number | null;
+    startDate?: Dayjs;
     endDate?: Dayjs;
     completed?: boolean;
     created: string;

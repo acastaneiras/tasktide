@@ -1,24 +1,25 @@
 import { Column } from "@/types";
-import { Eye } from "lucide-react";
+import { List, Hammer, Search, CheckCircle } from "lucide-react";
+
 export const kanbanColumns = [
     {
         id: 1,
         title: "To Do",
-        icon: Eye,
+        icon: List,
     },
     {
         id: 2,
         title: "Working",
-        icon: Eye,
+        icon: Hammer,
     },
     {
         id: 3,
         title: "Reviewing",
-        icon: Eye,
+        icon: Search,
     },
     {
         id: 4,
         title: "Completed",
-        icon: Eye,
+        icon: CheckCircle,
     }
 ] as Column[];

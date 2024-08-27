@@ -2,7 +2,7 @@
 import { Task } from "@/types";
 import { createClient } from "@/utils/supabase/server";
 
-export async function addOrUpdateTask(task: Task) {
+export async function addOrUpdateTask(task: object) {
     const supabase = createClient();
     const { data, error } = await supabase
         .from('tasks')

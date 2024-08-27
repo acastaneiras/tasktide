@@ -27,7 +27,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
         }
     }
     return (
-        <main className='overflow-hidden rounded-[0.5rem] bg-background h-full'>
+        <main className='overflow-hidden bg-background h-full'>
             <div className="flex flex-col h-full">
                 <div className="border-b">
                     <div className="flex h-16 items-center px-4">

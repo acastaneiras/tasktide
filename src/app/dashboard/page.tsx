@@ -1,6 +1,7 @@
-
 'use client'
-import { addOrUpdateTask } from '@/actions/DashboardActions'
+import { addOrUpdateTask, deleteTask } from '@/actions/DashboardActions'
+import DeleteTaskDialog from '@/components/custom/kanban/DeleteTaskDialog'
+import EditTaskDialog from '@/components/custom/kanban/EditTaskDialog'
 import KanbanBoard from '@/components/custom/kanban/KanbanBoard'
 import KanbanBoardContainer from '@/components/custom/kanban/KanbanBoardContainer'
 import KanbanColumn from '@/components/custom/kanban/KanbanColumn'
@@ -8,69 +9,67 @@ import KanbanColumnSkeleton from '@/components/custom/kanban/KanbanColumnSkeleto
 import KanbanTask from '@/components/custom/kanban/KanbanTask'
 import { KanbanTaskCardMemo } from '@/components/custom/kanban/KanbanTaskCard'
 import NoTasks from '@/components/custom/kanban/NoTasks'
+import { useKanbanStore } from '@/store/kanbanStore'
 import { kanbanColumns } from '@/utils/kanbanColumns'
 import { createClient } from '@/utils/supabase/client'
 import { DragEndEvent } from '@dnd-kit/core'
+import dayjs from 'dayjs'
 import { useEffect, useMemo, useState } from 'react'
+import { toast } from 'sonner'
 import { Column, Task } from '../../../types'
 
 
 export default function TasksPage() {
   const supabase = createClient();
   const [columns, setColumns] = useState<Column[]>(kanbanColumns);
-  const [tasks, setTasks] = useState<Task[]>([]);
+  const { tasks, setTasks, changeTask, isDeleteDialogOpen, isEditDialogOpen, setIsDeleteDialogOpen, setIsEditDialogOpen, selectedTaskId, setSelectedTaskId } = useKanbanStore();
   const [loading, setLoading] = useState(true);
 
 
   useEffect(() => {
-    //Function to fetch tasks
     const fetchTasks = async () => {
-      setLoading(true)
+      setLoading(true);
       const { data } = await supabase
         .from('tasks')
-        .select('*')
-      const tasks = data as Task[]
-      setTasks(tasks)
-      setLoading(false)
-    }
+        .select('*');
 
-    //Subscribe to changes in the tasks table
+      const tasks = (data as Task[]).map(task => ({
+        ...task,
+        startDate: task.startDate ? dayjs(task.startDate) : undefined,
+        endDate: task.endDate ? dayjs(task.endDate) : undefined,
+      }));
+      setTasks(tasks);
+      setLoading(false);
+    };
+
+    fetchTasks();
+  }, [supabase, setTasks]);
+
+  useEffect(() => {
     const tasksSubscription = supabase.channel('tasks-public')
       .on(
         'postgres_changes',
         { event: '*', schema: 'public', table: 'tasks' },
         (payload) => {
-          const { eventType, new: newTask, old: oldTask } = payload;
+          const { eventType, new: comingTask, old: prevTask } = payload;
 
-          setTasks((currentTasks) => {
-            let updatedTasks: Task[] = [...currentTasks];
+          let newTask = comingTask as Task;
+          let oldTask = prevTask as Task;
 
-            switch (eventType) {
-              case 'INSERT':
-                updatedTasks = [...updatedTasks, newTask as Task];
-                break;
-              case 'UPDATE':
-                updatedTasks = updatedTasks.map(task => task.id === newTask.id ? newTask as Task : task);
-                break;
-              case 'DELETE':
-                updatedTasks = updatedTasks.filter(task => task.id !== oldTask.id);
-                break;
-              default:
-                break;
-            }
-            return updatedTasks;
-          });
+          newTask.startDate = newTask.startDate ? dayjs(newTask.startDate) : undefined;
+          newTask.endDate = newTask.endDate ? dayjs(newTask.endDate) : undefined;
+          oldTask.startDate = oldTask.startDate ? dayjs(oldTask.startDate) : undefined;
+          oldTask.endDate = oldTask.endDate ? dayjs(oldTask.endDate) : undefined;
+
+
+          changeTask(eventType, newTask as Task, oldTask as Task);
         }
       )
-      .subscribe()
-
-    fetchTasks();
-
-    //Cleanup subscription on unmount
+      .subscribe();
     return () => {
-      supabase.removeChannel(tasksSubscription)
-    }
-  }, [supabase])
+      supabase.removeChannel(tasksSubscription);
+    };
+  }, [supabase, changeTask]);
 
   const taskColumns = useMemo(() => {
     if (!tasks.length || !columns.length) {
@@ -125,6 +124,17 @@ export default function TasksPage() {
     }
   };
 
+  const handleRemoveTask = async () => {
+    if (!selectedTaskId) return;
+    const { error } = await deleteTask(selectedTaskId);
+    if (error) {
+      toast.error('Error deleting task');
+    } else {
+      toast.success('Task deleted successfully');
+    }
+    setIsDeleteDialogOpen(false);
+  };
+
   const handleAddTask = async (args: { columnId: string }) => { };
 
   if (loading) {
@@ -141,7 +151,7 @@ export default function TasksPage() {
   }
 
   return (
-    <section className='h-full flex flex-1'>
+    <section className='h-full flex flex-1 bg-slate-50  dark:bg-foreground/5'>
       <KanbanBoardContainer>
         <KanbanBoard onDragEnd={handleOnDragEnd}>
           <KanbanColumn id="unassigned" title={"Unassigned"} count={taskColumns.unassignedColumn.length || 0} onAddClick={() => handleAddTask({ columnId: 'unassigned' })}>
@@ -150,7 +160,6 @@ export default function TasksPage() {
                 <KanbanTaskCardMemo {...task} />
               </KanbanTask>
             ))}
-
             {!taskColumns.unassignedColumn.length && (
               <NoTasks />
             )}
@@ -168,6 +177,15 @@ export default function TasksPage() {
             </KanbanColumn>
           ))}
         </KanbanBoard>
+        <EditTaskDialog
+          open={isEditDialogOpen}
+          onClose={() => { setIsEditDialogOpen(false); }}
+        />
+        <DeleteTaskDialog
+          open={isDeleteDialogOpen}
+          onClose={() => { setIsDeleteDialogOpen(false); }}
+          onDelete={handleRemoveTask}
+        />
       </KanbanBoardContainer>
     </section>
   )

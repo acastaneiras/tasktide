@@ -71,13 +71,30 @@
   * {
     @apply border-border;
   }
+
   body {
     @apply bg-background text-foreground;
   }
 }
 
 /*Custom CSS */
-.horizontal-scroll > div {
+.horizontal-scroll>div {
   display: flex !important;
   height: 100%;
+}
+
+@layer base {
+  :root {
+    --warning: 38 92% 50%;
+    --warning-foreground: 48 96% 89%;
+    --success: 38 92% 50%;
+    --success-foreground: 48 96% 89%;
+  }
+
+  .dark {
+    --success: 38 92% 50%;
+    --success-foreground: 48 96% 89%;
+    --warning: 38 92% 50%;
+    --warning-foreground: 48 96% 89%;
+  }
 }

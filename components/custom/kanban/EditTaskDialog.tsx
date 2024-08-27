@@ -20,13 +20,13 @@ import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { z } from 'zod';
+import { COMPLETED_COLUMN } from '@/types';
 
 interface EditTaskDialogProps {
     open: boolean;
     onClose: () => void;
 }
 
-// Define schema for validation using zod
 const FormSchema = z.object({
     title: z.string().nonempty({ message: 'Title is required' }),
     description: z.string().optional(),
@@ -42,6 +42,7 @@ const EditTaskDialog = ({ open, onClose }: EditTaskDialogProps) => {
     const setIsEditDialogOpen = useKanbanStore((state) => state.setIsEditDialogOpen);
 
     const [isPending, setIsPending] = useState(false);
+    const [completed, setCompleted] = useState(task?.completed ?? false);
 
     const form = useForm<z.infer<typeof FormSchema>>({
         resolver: zodResolver(FormSchema),
@@ -66,6 +67,7 @@ const EditTaskDialog = ({ open, onClose }: EditTaskDialogProps) => {
             setSelectedColumn(
                 kanbanColumns.find((col) => col.id === task.columnId) || null
             );
+            setCompleted(task.completed ?? false);
             reset({
                 title: task.title,
                 description: task.description || '',
@@ -76,6 +78,19 @@ const EditTaskDialog = ({ open, onClose }: EditTaskDialogProps) => {
             });
         }
     }, [task, reset]);
+
+    useEffect(() => {
+        if (completed) {
+            const completedColumn = kanbanColumns.find(col => col.id === COMPLETED_COLUMN);
+            setSelectedColumn(completedColumn || null);
+            form.setValue('columnId', COMPLETED_COLUMN);
+        } else if (task) {
+            //Revert to the task's original column if uncompleted
+            const originalColumn = kanbanColumns.find(col => col.id === task.columnId);
+            setSelectedColumn(originalColumn || null);
+            form.setValue('columnId', task.columnId ?? null);
+        }
+    }, [completed, task, form]);
 
     const handleSave = async (data: z.infer<typeof FormSchema>) => {
         if (!task) return;
@@ -240,7 +255,8 @@ const EditTaskDialog = ({ open, onClose }: EditTaskDialogProps) => {
                                                 <Button
                                                     variant="outline"
                                                     className="w-full justify-start"
-                                                    onClick={() => setPopoverOpen(true)}
+                                                    onClick={() => !completed && setPopoverOpen(true)}
+                                                    disabled={completed}
                                                 >
                                                     {selectedColumn ? (
                                                         <>
@@ -252,42 +268,48 @@ const EditTaskDialog = ({ open, onClose }: EditTaskDialogProps) => {
                                                     )}
                                                 </Button>
                                             </PopoverTrigger>
-                                            <PopoverContent className="p-0" align="center">
-                                                <Command>
-                                                    <CommandInput placeholder="Change column..." />
-                                                    <CommandList>
-                                                        <CommandEmpty>No results found.</CommandEmpty>
-                                                        <CommandGroup>
-                                                            <CommandItem
-                                                                value="null"
-                                                                onSelect={() => {
-                                                                    setSelectedColumn(null);
-                                                                    field.onChange(null);
-                                                                    setPopoverOpen(false);
-                                                                }}
-                                                            >
-                                                                <CircleHelp className="mr-2 h-4 w-4 opacity-40" />
-                                                                Unassigned
-                                                            </CommandItem>
-                                                            {kanbanColumns.map((column) => (
+                                            {!completed && (
+                                                <PopoverContent className="p-0" align="center">
+                                                    <Command>
+                                                        <CommandInput placeholder="Change column..." />
+                                                        <CommandList>
+                                                            <CommandEmpty>No results found.</CommandEmpty>
+                                                            <CommandGroup>
                                                                 <CommandItem
-                                                                    key={column.id}
-                                                                    value={column.id ? column.id.toString() : ''}
-                                                                    onSelect={(value: any) => {
-                                                                        const selected = kanbanColumns.find(col => col.id!.toString() === value);
-                                                                        setSelectedColumn(selected || null);
-                                                                        field.onChange(selected?.id ?? null);
+                                                                    value="null"
+                                                                    onSelect={() => {
+                                                                        setSelectedColumn(null);
+                                                                        field.onChange(null);
                                                                         setPopoverOpen(false);
                                                                     }}
                                                                 >
-                                                                    <column.icon className="mr-2 h-4 w-4 opacity-40" />
-                                                                    <span>{column.title}</span>
+                                                                    <CircleHelp className="mr-2 h-4 w-4 opacity-40" />
+                                                                    Unassigned
                                                                 </CommandItem>
-                                                            ))}
-                                                        </CommandGroup>
-                                                    </CommandList>
-                                                </Command>
-                                            </PopoverContent>
+                                                                {kanbanColumns.map((column) => (
+                                                                    <CommandItem
+                                                                        key={column.id}
+                                                                        value={column.id ? column.id.toString() : ''}
+                                                                        onSelect={(value: any) => {
+                                                                            const selected = kanbanColumns.find(col => col.id!.toString() === value);
+                                                                            setSelectedColumn(selected || null);
+                                                                            field.onChange(selected?.id ?? null);
+                                                                            setPopoverOpen(false);
+                                                                            if (selected?.id === COMPLETED_COLUMN) {
+                                                                                setCompleted(true);
+                                                                                form.setValue('completed', true);
+                                                                            }
+                                                                        }}
+                                                                    >
+                                                                        <column.icon className="mr-2 h-4 w-4 opacity-40" />
+                                                                        <span>{column.title}</span>
+                                                                    </CommandItem>
+                                                                ))}
+                                                            </CommandGroup>
+                                                        </CommandList>
+                                                    </Command>
+                                                </PopoverContent>
+                                            )}
                                         </Popover>
                                         <FormMessage />
                                     </FormItem>
@@ -300,7 +322,13 @@ const EditTaskDialog = ({ open, onClose }: EditTaskDialogProps) => {
                                     render={({ field }) => (
                                         <FormItem className="flex items-center space-x-2 space-y-0 mr-auto">
                                             <FormControl>
-                                                <Checkbox checked={field.value} onCheckedChange={field.onChange} />
+                                                <Checkbox
+                                                    checked={field.value}
+                                                    onCheckedChange={(checked) => {
+                                                        setCompleted(checked === "indeterminate" ? false : checked);
+                                                        field.onChange(checked);
+                                                    }}
+                                                />
                                             </FormControl>
                                             <FormLabel className='m-0'>Completed</FormLabel>
                                         </FormItem>

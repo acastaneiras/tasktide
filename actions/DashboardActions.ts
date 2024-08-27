@@ -1,8 +1,8 @@
 'use server'
-import { Task } from "@/types";
+import { COMPLETED_COLUMN, Task } from "@/types";
 import { createClient } from "@/utils/supabase/server";
 
-export async function addOrUpdateTask(task: object) {
+export async function addOrUpdateTask(task: any) {
     const supabase = createClient();
     const { data, error } = await supabase
         .from('tasks')

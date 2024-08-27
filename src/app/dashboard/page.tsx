@@ -16,7 +16,7 @@ import { DragEndEvent } from '@dnd-kit/core'
 import dayjs from 'dayjs'
 import { useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
-import { Column, Task } from '../../../types'
+import { Column, COMPLETED_COLUMN, Task } from '../../../types'
 
 
 export default function TasksPage() {
@@ -113,8 +113,14 @@ export default function TasksPage() {
 
     const updatedTasks = [...tasks]
     const updatedTask = { ...updatedTasks[taskIndex], columnId: parseInt(columnId!) };
+    //Check if the task is being moved to the completed column
+    if (parseInt(columnId!) === COMPLETED_COLUMN) {
+      updatedTask.completed = true;
+    } else {
+      updatedTask.completed = false;
+    }
     updatedTasks[taskIndex] = updatedTask;
-
+    
     setTasks(updatedTasks);
     let { error } = await addOrUpdateTask(updatedTask);
     //If there is an error, revert the changes

@@ -1,4 +1,6 @@
-import {Dayjs} from 'dayjs';
+import { Dayjs } from 'dayjs';
+
+export const COMPLETED_COLUMN = 4;
 
 export interface Task {
     id: number;

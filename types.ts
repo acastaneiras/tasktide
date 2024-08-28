@@ -12,7 +12,7 @@ export interface Task {
     completed?: boolean;
     created: string;
     updated?: string;
-    users: any[];
+    userId: string;
     completedDate: Dayjs | null;
 }
 

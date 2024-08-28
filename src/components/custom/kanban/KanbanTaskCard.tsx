@@ -15,7 +15,7 @@ import { memo, useMemo } from 'react'
 
 type BadgeTypes = "default" | "secondary" | "destructive" | "outline" | "warning" | "success" | "error" | null | undefined;
 
-const KanbanTaskCard = ({ id, title, startDate, endDate, description, completed, completedDate, users, created }: Task) => {
+const KanbanTaskCard = ({ id, title, startDate, endDate, description, completed, completedDate }: Task) => {
     const { setIsDeleteDialogOpen, setIsEditDialogOpen, setSelectedTaskId } = useKanbanStore();
 
     const dropdownItems = useMemo(() => {
@@ -127,7 +127,7 @@ export const KanbanTaskCardMemo = memo(KanbanTaskCard, (prevProps, nextProps) =>
         prevProps.title === nextProps.title &&
         prevProps.startDate === nextProps.startDate &&
         prevProps.endDate === nextProps.endDate &&
-        prevProps.users === nextProps.users &&
+        prevProps.userId === nextProps.userId &&
         prevProps.updated === nextProps.updated
     );
 });

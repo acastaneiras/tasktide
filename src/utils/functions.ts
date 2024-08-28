@@ -23,7 +23,6 @@ export const getDateText = (args: {
     end: dayjs.Dayjs | null;
     completedDate?: dayjs.Dayjs | null;
 }): string => {
-    console.log(args);
     if (args.completedDate) return `Done ${args.completedDate.format("MMM DD")}`;
     if (!args.start && !args.end) return "No date";
     if (!args.end) return `Starts on ${args.start?.format("MMM DD")}`;

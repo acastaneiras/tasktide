@@ -7,7 +7,7 @@ import { ScrollArea } from '@/components/ui/scroll-area'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { cn } from '@/lib/utils'
 import { useKanbanStore } from '@/store/kanbanStore'
-import { Task } from '@/types'
+import { Task } from '@root/types'
 import { getDateColor, getDateText } from '@/utils/functions'
 import dayjs from 'dayjs'
 import { Clock, EllipsisVertical, Eye, Trash } from 'lucide-react'
@@ -15,7 +15,7 @@ import { memo, useMemo } from 'react'
 
 type BadgeTypes = "default" | "secondary" | "destructive" | "outline" | "warning" | "success" | "error" | null | undefined;
 
-const KanbanTaskCard = ({ id, title, startDate, endDate, description, completed, completedDate,  users, created }: Task) => {
+const KanbanTaskCard = ({ id, title, startDate, endDate, description, completed, completedDate, users, created }: Task) => {
     const { setIsDeleteDialogOpen, setIsEditDialogOpen, setSelectedTaskId } = useKanbanStore();
 
     const dropdownItems = useMemo(() => {
@@ -53,7 +53,7 @@ const KanbanTaskCard = ({ id, title, startDate, endDate, description, completed,
             color: end ? getDateColor({ date: end.toISOString() }) as BadgeTypes : "outline",
             text: getDateText({ start, end })
         };
-    }, [startDate, endDate]);
+    }, [startDate, endDate, completed, completedDate]);
 
     return (
         <TooltipProvider>
@@ -62,7 +62,7 @@ const KanbanTaskCard = ({ id, title, startDate, endDate, description, completed,
                     <CardTitle className="flex align-center justify-between">
                         <Tooltip>
                             <TooltipTrigger asChild>
-                                <span className="truncate text-lg items-center flex">{title}</span>
+                                <span className="truncate text-lg inline-block align-middle h-full my-auto">{title}</span>
                             </TooltipTrigger>
                             <TooltipContent>
                                 {title}
@@ -88,33 +88,32 @@ const KanbanTaskCard = ({ id, title, startDate, endDate, description, completed,
                         </DropdownMenu>
                     </CardTitle>
                 </CardHeader>
-                <hr />
-                {description && <CardContent className='p-3'>
-                    {
-                        description.length >= 60 ? (
-                            <Tooltip>
-                                <TooltipTrigger asChild>
-                                    <p className="line-clamp-2">{description}</p>
-                                </TooltipTrigger>
-                                <TooltipContent>
-                                    <ScrollArea className='h-[150px] rounded-md p-4 text-pretty text-md'>
-                                        {description}
-                                    </ScrollArea>
-                                </TooltipContent>
-                            </Tooltip>
-                        ) : (
-                            <p className='line-clamp-2'>{description}</p>
-                        )
-                    }
-                </CardContent>}
+                {dateConfig &&<hr />}
+                {description &&
+                    <CardContent className='p-3'>
+                        {
+                            description.length >= 60 ? (
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <p className="line-clamp-2">{description}</p>
+                                    </TooltipTrigger>
+                                    <TooltipContent>
+                                        <ScrollArea className='h-[150px] rounded-md p-4 text-pretty text-md'>
+                                            {description}
+                                        </ScrollArea>
+                                    </TooltipContent>
+                                </Tooltip>
+                            ) : (
+                                <p className='line-clamp-2'>{description}</p>
+                            )
+                        }
+                    </CardContent>}
 
-                <CardFooter className="flex justify-between items-center gap-2 p-3">
-                    {dateConfig && (
+                {dateConfig && (
+                    <CardFooter className="flex justify-between items-center gap-2 p-3">
                         <Badge variant={dateConfig.color} className='flex gap-1 text-xs'><Clock className='w-4 h-4' /> {dateConfig.text}</Badge>
-                    )}
-
-                    {/*ToDo - Users assigned*/}
-                </CardFooter>
+                    </CardFooter>
+                )}
             </Card>
         </TooltipProvider>
     );

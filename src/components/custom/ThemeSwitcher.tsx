@@ -1,8 +1,6 @@
 "use client"
-import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSubContent } from '@/components/ui/dropdown-menu'
-import { Sun, Moon, Monitor } from 'lucide-react'
-import React from 'react'
-import { Button } from '@/components/ui/button'
+import { DropdownMenuItem, DropdownMenuSubContent } from '@/components/ui/dropdown-menu'
+import { Monitor, Moon, Sun } from 'lucide-react'
 import { useTheme } from 'next-themes'
 
 const ThemeSwitcher = ({ className }: { className?: string }) => {

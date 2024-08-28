@@ -1,5 +1,4 @@
 'use server'
-import { COMPLETED_COLUMN, Task } from "@/types";
 import { createClient } from "@/utils/supabase/server";
 
 export async function addOrUpdateTask(task: any) {
@@ -16,6 +15,5 @@ export async function deleteTask(taskId: number) {
         .from('tasks')
         .delete()
         .eq('id', taskId);
-        console.log(error, data)
     return { data, error }
 }

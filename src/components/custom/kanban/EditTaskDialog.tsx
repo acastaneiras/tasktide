@@ -20,7 +20,7 @@ import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { z } from 'zod';
-import { COMPLETED_COLUMN } from '@/types';
+import { COMPLETED_COLUMN } from '@root/types';
 
 interface EditTaskDialogProps {
     open: boolean;
@@ -61,6 +61,11 @@ const EditTaskDialog = ({ open, onClose }: EditTaskDialogProps) => {
         kanbanColumns.find((col) => col.id === task?.columnId) || null
     );
     const [popoverOpen, setPopoverOpen] = useState(false);
+
+    const handleOnClose = () => {
+        reset();
+        onClose();
+    };
 
     useEffect(() => {
         if (task) {
@@ -113,8 +118,6 @@ const EditTaskDialog = ({ open, onClose }: EditTaskDialogProps) => {
         setIsPending(false);
 
         if (error) {
-            console.log(updatedTask);
-            console.log(error);
             toast.error('An error occurred while saving the task.');
         } else {
             toast.success('Task saved successfully.');
@@ -124,7 +127,7 @@ const EditTaskDialog = ({ open, onClose }: EditTaskDialogProps) => {
     };
 
     return (
-        <Dialog open={open} onOpenChange={onClose}>
+        <Dialog open={open} onOpenChange={handleOnClose}>
             <DialogContent onPointerDown={(e) => e.stopPropagation()}>
                 <DialogHeader>
                     <DialogTitle>{task ? 'Edit Task' : 'No Task Selected'}</DialogTitle>
@@ -265,7 +268,9 @@ const EditTaskDialog = ({ open, onClose }: EditTaskDialogProps) => {
                                                             {selectedColumn.title}
                                                         </>
                                                     ) : (
-                                                        <span>Unassigned</span>
+                                                        <>
+                                                        <CircleHelp className="mr-2 h-4 w-4 shrink-0" /> Unassigned
+                                                        </>
                                                     )}
                                                 </Button>
                                             </PopoverTrigger>
@@ -340,7 +345,7 @@ const EditTaskDialog = ({ open, onClose }: EditTaskDialogProps) => {
                                     {isPending ? "Saving..." : "Save"}
                                 </Button>
                                 <DialogClose asChild>
-                                    <Button variant="outline" onClick={onClose} disabled={isPending}>
+                                    <Button variant="outline" onClick={handleOnClose} disabled={isPending}>
                                         Cancel
                                     </Button>
                                 </DialogClose>

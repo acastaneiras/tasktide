@@ -1,4 +1,4 @@
-import { Column } from "@/types";
+import { Column } from "@root/types";
 import { List, Hammer, Search, CheckCircle } from "lucide-react";
 
 export const kanbanColumns = [

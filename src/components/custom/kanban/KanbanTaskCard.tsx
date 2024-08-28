@@ -36,7 +36,7 @@ const KanbanTaskCard = ({ id, title, startDate, endDate, description, completed,
     }, [setIsDeleteDialogOpen, setIsEditDialogOpen, id, setSelectedTaskId]);
 
     const dateConfig = useMemo(() => {
-        if (!endDate && !startDate) return null;
+        if (!endDate && !startDate && !completedDate) return null;
         let start: dayjs.Dayjs | null = null;
         let end: dayjs.Dayjs | null = null;
 
@@ -62,7 +62,7 @@ const KanbanTaskCard = ({ id, title, startDate, endDate, description, completed,
                     <CardTitle className="flex align-center justify-between">
                         <Tooltip>
                             <TooltipTrigger asChild>
-                                <span className="truncate text-lg inline-block align-middle h-full my-auto">{title}</span>
+                                <span className="truncate text-[1.05rem]/6 inline-block align-middle h-full my-auto">{title}</span>
                             </TooltipTrigger>
                             <TooltipContent>
                                 {title}

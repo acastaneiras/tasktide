@@ -13,7 +13,7 @@ import { useKanbanStore } from '@/store/kanbanStore'
 import { kanbanColumns } from '@/utils/kanbanColumns'
 import { createClient } from '@/utils/supabase/client'
 import { DragEndEvent } from '@dnd-kit/core'
-import dayjs from 'dayjs'
+import dayjs, { Dayjs } from 'dayjs'
 import { useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 import { Column, COMPLETED_COLUMN, Task } from '../../../types'
@@ -24,7 +24,8 @@ export default function TasksPage() {
   const [columns, setColumns] = useState<Column[]>(kanbanColumns);
   const { tasks, setTasks, changeTask, isDeleteDialogOpen, isEditDialogOpen, setIsDeleteDialogOpen, setIsEditDialogOpen, selectedTaskId, setSelectedTaskId } = useKanbanStore();
   const [loading, setLoading] = useState(true);
-
+  
+  const userId = process.env.NEXT_PUBLIC_DEV_USER_ID;
 
   useEffect(() => {
     const fetchTasks = async () => {
@@ -32,6 +33,7 @@ export default function TasksPage() {
       const { data } = await supabase
         .from('tasks')
         .select('*')
+        .eq('userId', userId)
         .order('endDate', { ascending: true });
 
       const tasks = (data as Task[]).map(task => ({
@@ -45,13 +47,13 @@ export default function TasksPage() {
     };
 
     fetchTasks();
-  }, [supabase, setTasks]);
+  }, [supabase, setTasks, userId]);
 
   useEffect(() => {
     const tasksSubscription = supabase.channel('tasks-public')
       .on(
         'postgres_changes',
-        { event: '*', schema: 'public', table: 'tasks' },
+        { event: '*', schema: 'public', table: 'tasks',filter: `userId=eq.${userId}` },
         (payload) => {
           const { eventType, new: comingTask, old: prevTask } = payload;
 
@@ -69,7 +71,7 @@ export default function TasksPage() {
     return () => {
       supabase.removeChannel(tasksSubscription);
     };
-  }, [supabase, changeTask]);
+  }, [supabase, changeTask, userId]);
 
   const taskColumns = useMemo(() => {
     if (!tasks.length || !columns.length) {
@@ -121,10 +123,10 @@ export default function TasksPage() {
       updatedTask.completed = false;
       updatedTask.completedDate = null;
     }
-    updatedTasks[taskIndex] = updatedTask;
 
+    updatedTasks[taskIndex] = updatedTask;
     setTasks(updatedTasks);
-    let { error } = await addOrUpdateTask(updatedTask);
+    let { error } = await addOrUpdateTask(JSON.parse(JSON.stringify(updatedTask)));
     //If there is an error, revert the changes
     if (error) {
       updatedTasks[taskIndex] = originalTask;

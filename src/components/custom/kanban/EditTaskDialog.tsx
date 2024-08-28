@@ -40,6 +40,7 @@ const EditTaskDialog = ({ open, onClose }: EditTaskDialogProps) => {
     const selectedTaskId = useKanbanStore((state) => state.selectedTaskId);
     const task = useKanbanStore((state) => state.getTaskById(selectedTaskId));
     const setIsEditDialogOpen = useKanbanStore((state) => state.setIsEditDialogOpen);
+    const setSelectedTaskId = useKanbanStore((state) => state.setSelectedTaskId);
 
     const [isPending, setIsPending] = useState(false);
     const [completed, setCompleted] = useState(task?.completed ?? false);
@@ -63,6 +64,7 @@ const EditTaskDialog = ({ open, onClose }: EditTaskDialogProps) => {
     const [popoverOpen, setPopoverOpen] = useState(false);
 
     const handleOnClose = () => {
+        setSelectedTaskId(null)
         reset();
         onClose();
     };
@@ -99,9 +101,9 @@ const EditTaskDialog = ({ open, onClose }: EditTaskDialogProps) => {
 
     const handleSave = async (data: z.infer<typeof FormSchema>) => {
         if (!task) return;
-
+    
         setIsPending(true);
-
+    
         const updatedTask = {
             ...task,
             title: data.title,
@@ -110,13 +112,13 @@ const EditTaskDialog = ({ open, onClose }: EditTaskDialogProps) => {
             endDate: data.endDate ? dayjs(data.endDate).toISOString() : undefined,
             completedDate: (completed && task.completedDate === null) ? dayjs().toISOString() : null,
             completed: data.completed,
-            columnId: data.columnId === null ? null : Number(data.columnId),
+            columnId: data.columnId === null || data.columnId === '' ? null : Number(data.columnId),
         };
-
-        const { error } = await addOrUpdateTask(updatedTask);
+        
+        const { error } = await addOrUpdateTask(JSON.parse(JSON.stringify(updatedTask)));
 
         setIsPending(false);
-
+    
         if (error) {
             toast.error('An error occurred while saving the task.');
         } else {
@@ -137,7 +139,7 @@ const EditTaskDialog = ({ open, onClose }: EditTaskDialogProps) => {
                         </DialogDescription>
                     )}
                 </DialogHeader>
-                {task ? (
+            
                     <Form {...form}>
                         <form onSubmit={form.handleSubmit(handleSave)} className="space-y-4">
                             <FormField
@@ -353,9 +355,7 @@ const EditTaskDialog = ({ open, onClose }: EditTaskDialogProps) => {
                             </DialogFooter>
                         </form>
                     </Form>
-                ) : (
-                    <div>No task selected. Please select a task to edit.</div>
-                )}
+                
             </DialogContent>
         </Dialog>
     );

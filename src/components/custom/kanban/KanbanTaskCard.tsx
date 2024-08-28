@@ -23,13 +23,13 @@ const KanbanTaskCard = ({ id, title, startDate, endDate, description, completed,
             {
                 label: 'View task',
                 icon: <Eye className='w-4 h-4' />,
-                onClick: () => { setIsEditDialogOpen(true); setSelectedTaskId(id); },
+                onClick: () => { setSelectedTaskId(id); setIsEditDialogOpen(true); },
                 classes: 'text-primary'
             },
             {
                 label: 'Delete task',
                 icon: <Trash className='w-4 h-4' />,
-                onClick: () => { setIsDeleteDialogOpen(true); setSelectedTaskId(id); },
+                onClick: () => { setSelectedTaskId(id); setIsDeleteDialogOpen(true); },
                 classes: 'text-destructive dark:hover:text-primary hover:text-white hover:bg-destructive/90 focus:bg-destructive/90 focus:text-white'
             }
         ];
@@ -57,7 +57,7 @@ const KanbanTaskCard = ({ id, title, startDate, endDate, description, completed,
 
     return (
         <TooltipProvider>
-            <Card className="w-full">
+            <Card className="w-full" onClick={() => { setSelectedTaskId(id); setIsEditDialogOpen(true); }}>
                 <CardHeader className='p-3'>
                     <CardTitle className="flex align-center justify-between">
                         <Tooltip>
@@ -88,7 +88,7 @@ const KanbanTaskCard = ({ id, title, startDate, endDate, description, completed,
                         </DropdownMenu>
                     </CardTitle>
                 </CardHeader>
-                {dateConfig &&<hr />}
+                {dateConfig && <hr />}
                 {description &&
                     <CardContent className='p-3'>
                         {

@@ -103,7 +103,13 @@
   z-index: 2000 !important;
 }
 
-@media (max-height: 768px) {
+@media (max-width: 768px) { /* Tablets, Mobiles */
+  .modalContent {
+    height: 24rem;
+  }
+}
+
+@media (max-height: 768px) { /* Low res Desktops */
   .modalContent {
     height: 24rem;
   }

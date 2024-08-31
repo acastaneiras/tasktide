@@ -188,7 +188,6 @@ const KanbanClientComponent = ({userId}: {userId: string}) => {
             </KanbanBoard>
             <EditTaskDialog
                 open={isEditDialogOpen}
-                onClose={() => { setIsEditDialogOpen(false); }}
             />
             <DeleteTaskDialog
                 open={isDeleteDialogOpen}

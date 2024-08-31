@@ -1,4 +1,5 @@
 import { Task } from '@root/types';
+import dayjs from 'dayjs';
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 
@@ -7,6 +8,7 @@ interface KanbanState {
     isEditDialogOpen: boolean;
     isDeleteDialogOpen: boolean;
     selectedTaskId: number | null;
+    breakPoint: number | null;
     setTasks: (tasks: Task[]) => void;
     setIsEditDialogOpen: (isOpen: boolean) => void;
     setIsDeleteDialogOpen: (isOpen: boolean) => void;
@@ -23,9 +25,32 @@ export const useKanbanStore = create<KanbanState>()(
                 isEditDialogOpen: false,
                 isDeleteDialogOpen: false,
                 selectedTaskId: null,
+                breakPoint: null,
                 setTasks: (tasks) => set({ tasks }),
-                setIsEditDialogOpen: (isOpen) => set({ isEditDialogOpen: isOpen }),
-                setIsDeleteDialogOpen: (isOpen) => set({ isDeleteDialogOpen: isOpen }),
+                setIsEditDialogOpen: (isOpen) => {
+                    if (isOpen) {
+                        set({ isEditDialogOpen: true, breakPoint: Date.now() });
+                    } else {
+                        const state = get();
+                        if (Date.now() - (state.breakPoint || 0) < 100) {
+                            set({ isEditDialogOpen: true });
+                        } else {
+                            set({ isEditDialogOpen: false });
+                        }
+                    }
+                },
+                setIsDeleteDialogOpen: (isOpen) => {
+                    if (isOpen) {
+                        set({ isDeleteDialogOpen: true, breakPoint: Date.now() });
+                    } else {
+                        const state = get();
+                        if (Date.now() - (state.breakPoint || 0) < 100) {
+                            set({ isDeleteDialogOpen: true });
+                        } else {
+                            set({ isDeleteDialogOpen: false });
+                        }
+                    }
+                },
                 changeTask: (eventType, newTask, oldTask) => {
                     const { tasks } = get();
                     let updatedTasks: Task[] = [...tasks];
@@ -43,7 +68,7 @@ export const useKanbanStore = create<KanbanState>()(
                         default:
                             break;
                     }
-                    
+
                     updatedTasks.sort((a, b) => {
                         if (!a.endDate) return 1;
                         if (!b.endDate) return -1;

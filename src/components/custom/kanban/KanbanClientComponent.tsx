@@ -39,7 +39,6 @@ const KanbanClientComponent = ({userId}: {userId: string}) => {
                 endDate: task.endDate ? dayjs(task.endDate) : undefined,
                 completedDate: task.completedDate ? dayjs(task.completedDate) : null
             }));
-            console.log(tasks)
             setTasks(tasks);
             setLoading(false);
         };

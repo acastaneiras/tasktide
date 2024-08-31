@@ -78,7 +78,7 @@
 }
 
 /*Custom CSS */
-.horizontal-scroll>div {
+.horizontal-scroll>*>div {
   display: flex !important;
   height: 100%;
 }
@@ -97,4 +97,70 @@
     --success: 144, 78%, 36%;
     --success-foreground: 144 88% 53%;
   }
+}
+
+[class*="popupContainer"] {
+  z-index: 2000 !important;
+}
+
+@media (max-height: 768px) {
+  .modalContent {
+    height: 24rem;
+  }
+  .card-title {
+    max-width: 12rem;
+  }
+
+  .kanban-column {
+    height: calc(100%-4rem)
+  }
+}
+
+.mdxeditor > div:first-child  {
+  @apply bg-background text-foreground;
+  @apply border border-border;
+  border-bottom-left-radius: 0%;
+  border-bottom-right-radius: 0%;
+}
+
+.mdxeditor.dark-theme button[role="combobox"] {
+  @apply bg-transparent;
+}
+
+.mdxeditor.dark-theme select, .mdxeditor.dark-theme select option {
+  @apply bg-background;
+}
+
+.mdxeditor-popup-container > div {
+  @apply bg-background;
+}
+
+.mdxeditor.dark-theme .mdxeditor-root-contenteditable > div:first-child {
+  @apply border border-border;
+}
+
+.mdxeditor .mdxeditor-root-contenteditable > div:first-child {
+  @apply border border-border;
+  @apply rounded-br rounded-bl;
+}
+.prose ul {
+  @apply list-disc list-inside;
+}
+
+.prose ol {
+  @apply list-decimal list-inside;
+}
+
+.prose li {
+  @apply mb-2;
+} 
+
+.prose li[role="checkbox"] {
+  @apply ml-0;
+}
+.prose :where(hr):not(:where([class~=not-prose] *)) {
+  border-color: var(--tw-prose-hr);
+  border-top-width: 1px;
+  margin-top: 3em;
+  margin-bottom: 3em;
 }

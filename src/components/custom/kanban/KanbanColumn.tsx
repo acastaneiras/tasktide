@@ -30,8 +30,7 @@ const KanbanColumn = ({ children, id, title, description, count, data, onAddClic
 
   return (
     <TooltipProvider>
-
-      <div ref={setNodeRef} className='flex flex-col px-4 md:max-w-xl min-w-80 w-full'>
+      <div ref={setNodeRef} className='flex flex-col px-4 min-w-[22rem] w-full'>
         <div className='py-3 px-4'>
           <div className='flex justify-between w-full'>
             <h2 className='text-lg font-semibold whitespace-nowrap flex gap-3 items-center'>
@@ -53,8 +52,8 @@ const KanbanColumn = ({ children, id, title, description, count, data, onAddClic
           </div>
           <p className='text-sm'>{description}</p>
         </div>
-        <ScrollArea className={cn('flex-1 rounded border-dashed border-2 border-transparent px-4 h-full pb-10', isOver ? 'border-primary/60' : 'border-transparent')}>
-          <div className='flex flex-col w-full mt-3 gap-2'>{children}</div>
+        <ScrollArea className={cn('flex-1 rounded border-dashed border-2 border-transparent px-4 h-full', isOver ? 'border-primary/60' : 'border-transparent')}>
+          <div className='flex flex-col w-full mt-3 gap-2 h-48'>{children}</div>
         </ScrollArea>
       </div>
     </TooltipProvider>

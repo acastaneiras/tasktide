@@ -1,17 +1,17 @@
-'use client'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
-import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
-import { ScrollArea } from '@/components/ui/scroll-area'
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
-import { cn } from '@/lib/utils'
-import { useKanbanStore } from '@/store/kanbanStore'
-import { Task } from '@root/types'
-import { getDateColor, getDateText } from '@/utils/functions'
-import dayjs from 'dayjs'
-import { Clock, EllipsisVertical, Eye, Trash } from 'lucide-react'
-import { memo, useMemo } from 'react'
+import ReactMarkdown from 'react-markdown';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { cn } from '@/lib/utils';
+import { useKanbanStore } from '@/store/kanbanStore';
+import { Task } from '@root/types';
+import { getDateColor, getDateText } from '@/utils/functions';
+import dayjs from 'dayjs';
+import { Clock, EllipsisVertical, Eye, Trash } from 'lucide-react';
+import { memo, useMemo } from 'react';
 
 type BadgeTypes = "default" | "secondary" | "destructive" | "outline" | "warning" | "success" | "error" | null | undefined;
 
@@ -59,10 +59,10 @@ const KanbanTaskCard = ({ id, title, startDate, endDate, description, completed,
         <TooltipProvider>
             <Card className="w-full" onClick={() => { setSelectedTaskId(id); setIsEditDialogOpen(true); }}>
                 <CardHeader className='p-3'>
-                    <CardTitle className="flex align-center justify-between">
+                    <CardTitle className="flex items-center justify-between">
                         <Tooltip>
                             <TooltipTrigger asChild>
-                                <span className="truncate text-[1.05rem]/6 inline-block align-middle h-full my-auto">{title}</span>
+                                <span className="truncate text-[1.05rem]/6 inline-block align-middle h-full my-auto  max-w-52 card-title">{title}</span>
                             </TooltipTrigger>
                             <TooltipContent>
                                 {title}
@@ -77,7 +77,7 @@ const KanbanTaskCard = ({ id, title, startDate, endDate, description, completed,
                             <DropdownMenuContent>
                                 <DropdownMenuGroup>
                                     {dropdownItems.map(item => (
-                                        <DropdownMenuItem key={item.label} onPointerDown={(e) => { e.stopPropagation(); }} onClick={item.onClick}
+                                        <DropdownMenuItem key={item.label} onPointerDown={(e) => { e.stopPropagation(); }} onClick={(e) => { e.stopPropagation(); item.onClick(); }}
                                             className={cn(item.classes, "flex items-center cursor-pointer gap-2")}>
                                             {item.icon}
                                             <span>{item.label}</span>
@@ -95,16 +95,20 @@ const KanbanTaskCard = ({ id, title, startDate, endDate, description, completed,
                             description.length >= 60 ? (
                                 <Tooltip>
                                     <TooltipTrigger asChild>
-                                        <p className="line-clamp-2">{description}</p>
+                                        <div className="line-clamp-2 w-full break-all">
+                                            <ReactMarkdown>{description}</ReactMarkdown>
+                                        </div>
                                     </TooltipTrigger>
                                     <TooltipContent>
-                                        <ScrollArea className='h-[150px] rounded-md p-4 text-pretty text-md'>
-                                            {description}
+                                        <ScrollArea className='h-[150px] rounded-md p-4 text-pretty text-md break-all'>
+                                            <ReactMarkdown>{description}</ReactMarkdown>
                                         </ScrollArea>
                                     </TooltipContent>
                                 </Tooltip>
                             ) : (
-                                <p className='line-clamp-2'>{description}</p>
+                                <div className='line-clamp-2 w-full break-all'>
+                                    <ReactMarkdown>{description}</ReactMarkdown>
+                                </div>
                             )
                         }
                     </CardContent>}

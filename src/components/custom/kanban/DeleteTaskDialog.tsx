@@ -23,7 +23,7 @@ const DeleteTaskDialog = ({ open, onClose, onDelete }: DeleteTaskDialogProps) =>
                 <DialogDescription>
                     {task ? "This action cannot be undone." : "Please select a task to delete."}
                 </DialogDescription>
-                <DialogFooter>
+                <DialogFooter className='gap-2'>
                     {task && (
                         <DialogClose asChild>
                             <Button variant='destructive' onClick={onDelete}>Delete</Button>

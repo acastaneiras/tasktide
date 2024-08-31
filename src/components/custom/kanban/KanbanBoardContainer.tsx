@@ -4,7 +4,7 @@ import React from 'react'
 const KanbanBoardContainer = ({ children }: React.PropsWithChildren) => {
   return (
     <div className='relative flex flex-col w-full h-full'>
-      <ScrollArea className='w-full h-[100%] flex flex-col p-8 overflow-x-auto horizontal-scroll'>
+      <ScrollArea className='w-full h-full flex flex-col p-8 overflow-x-auto horizontal-scroll'>
           <div className='flex h-full'>
           {children}
           </div>

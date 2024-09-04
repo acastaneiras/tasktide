@@ -19,7 +19,7 @@ import {
 } from "@mdxeditor/editor";
 import '@mdxeditor/editor/style.css';
 import { useTheme } from "next-themes";
-import { FC } from "react";
+import { FC, useEffect, useState } from "react";
 
 interface EditorProps {
     markdown: string;
@@ -28,11 +28,20 @@ interface EditorProps {
 }
 
 const Editor: FC<EditorProps> = ({ markdown, editorRef, onChange }) => {
-    const { theme } = useTheme();
+    const { theme, systemTheme } = useTheme();
+    const [currentTheme, setCurrentTheme] = useState<string>("light");
+
+    useEffect(() => {
+        if (theme === "system") {
+            setCurrentTheme(systemTheme === "dark" ? "dark" : "light");
+        } else {
+            setCurrentTheme(theme === "dark" ? "dark" : "light");
+        }
+    }, [theme, systemTheme]);
 
     return (
         <MDXEditor
-            className={theme === 'dark' ? 'dark-theme dark-editor' : ''}
+            className={currentTheme === 'dark' ? 'dark-theme dark-editor' : ''}
             onChange={onChange}
             contentEditableClassName='prose'
             ref={editorRef}

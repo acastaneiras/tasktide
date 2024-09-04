@@ -4,11 +4,13 @@ import { devtools, persist } from 'zustand/middleware';
 
 interface KanbanState {
     tasks: Task[];
+    isAddDialogOpen: boolean;
     isEditDialogOpen: boolean;
     isDeleteDialogOpen: boolean;
     selectedTaskId: number | null;
     breakPoint: number | null;
     setTasks: (tasks: Task[]) => void;
+    setIsAddDialogOpen: (isOpen: boolean) => void;
     setIsEditDialogOpen: (isOpen: boolean) => void;
     setIsDeleteDialogOpen: (isOpen: boolean) => void;
     changeTask: (eventType: string, newTask?: Task, oldTask?: Task) => void;
@@ -23,12 +25,25 @@ export const useKanbanStore = create<KanbanState>()(
         persist(
             (set, get) => ({
                 tasks: [],
+                isAddDialogOpen: false,
                 isEditDialogOpen: false,
                 isDeleteDialogOpen: false,
                 selectedTaskId: null,
                 breakPoint: null,
                 setTasks: (tasks) => set({ tasks }),
-                setIsEditDialogOpen: (isOpen) => {
+                setIsAddDialogOpen: (isOpen: boolean) => {
+                    if (isOpen) {
+                        set({ isAddDialogOpen: true, breakPoint: Date.now() });
+                    } else {
+                        const state = get();
+                        if (Date.now() - (state.breakPoint || 0) < 100) {
+                            set({ isAddDialogOpen: true });
+                        } else {
+                            set({ isAddDialogOpen: false });
+                        }
+                    }
+                },
+                setIsEditDialogOpen: (isOpen: boolean) => {
                     if (isOpen) {
                         set({ isEditDialogOpen: true, breakPoint: Date.now() });
                     } else {
@@ -40,7 +55,7 @@ export const useKanbanStore = create<KanbanState>()(
                         }
                     }
                 },
-                setIsDeleteDialogOpen: (isOpen) => {
+                setIsDeleteDialogOpen: (isOpen: boolean) => {
                     if (isOpen) {
                         set({ isDeleteDialogOpen: true, breakPoint: Date.now() });
                     } else {

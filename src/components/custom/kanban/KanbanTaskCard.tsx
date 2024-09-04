@@ -96,7 +96,7 @@ const KanbanTaskCard = ({ id, title, startDate, endDate, description, completed,
                         </DropdownMenu>
                     </CardTitle>
                 </CardHeader>
-                {dateConfig && <hr />}
+                {(dateConfig || description)  && <hr />}
                 {description &&
                     <CardContent className='p-3'>
                         {

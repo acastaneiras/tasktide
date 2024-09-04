@@ -29,7 +29,7 @@ export default function RootLayout({
         >
           {children}
         </ThemeProvider>
-        <Toaster closeButton />
+        <Toaster/>
       </body>
     </html>
   );

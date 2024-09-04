@@ -17,13 +17,16 @@ import { useKanbanStore } from '@/store/kanbanStore'
 import { createClient } from '@/utils/supabase/client'
 import dayjs from 'dayjs'
 import KanbanColumnSkeleton from './KanbanColumnSkeleton'
+import { set } from 'date-fns'
+import AddTaskDialog from './AddTaskDialog'
 
 
 const KanbanClientComponent = ({ userId }: { userId: string }) => {
     const supabase = createClient();
     const columns = kanbanColumns as Column[];
-    const { tasks, setTasks, changeTask, isDeleteDialogOpen, isEditDialogOpen, setIsDeleteDialogOpen, changeDependency, selectedTaskId } = useKanbanStore();
+    const { tasks, setTasks, changeTask, isDeleteDialogOpen, isEditDialogOpen, setIsDeleteDialogOpen, changeDependency, selectedTaskId, setSelectedTaskId, setIsAddDialogOpen, isAddDialogOpen } = useKanbanStore();
     const [loading, setLoading] = useState(true);
+    const [selectedColumnId, setSelectedColumnId] = useState<number | null>(null);
 
     useEffect(() => {
         const callFetch = async () => {
@@ -146,7 +149,11 @@ const KanbanClientComponent = ({ userId }: { userId: string }) => {
         setIsDeleteDialogOpen(false);
     };
 
-    const handleAddTask = async (args: { columnId: string }) => { };
+    const handleAddTask = async (args: { columnId: number | null }) => { 
+        setSelectedTaskId(null);
+        setSelectedColumnId(args.columnId);
+        setIsAddDialogOpen(true);
+    };
 
     const taskColumns = useMemo(() => {
         const taskColumns = columns.map(column => {
@@ -165,7 +172,6 @@ const KanbanClientComponent = ({ userId }: { userId: string }) => {
         }
 
         const unassignedColumn = tasks.filter(task => !task.columnId)
-
 
         return {
             unassignedColumn,
@@ -191,7 +197,7 @@ const KanbanClientComponent = ({ userId }: { userId: string }) => {
     return (
         <KanbanBoardContainer>
             <KanbanBoard onDragEnd={handleOnDragEnd}>
-                <KanbanColumn id="unassigned" title={"Unassigned"} count={taskColumns.unassignedColumn.length || 0} onAddClick={() => handleAddTask({ columnId: 'unassigned' })}>
+                <KanbanColumn id="unassigned" title={"Unassigned"} count={taskColumns.unassignedColumn.length || 0} onAddClick={() => handleAddTask({ columnId: null })}>
                     {taskColumns.unassignedColumn.map(task => (
                         <KanbanTask key={task.id} id={task.id} data={{ ...task, columnId: 'unassigned' }} >
                             <KanbanTaskCardMemo {...task} />
@@ -202,7 +208,7 @@ const KanbanClientComponent = ({ userId }: { userId: string }) => {
                     )}
                 </KanbanColumn>
                 {taskColumns.columns.map(column => (
-                    <KanbanColumn key={column.id} id={column.id!.toString()} title={column.title} count={column.tasks.length} onAddClick={() => handleAddTask({ columnId: column.id!.toString() })}>
+                    <KanbanColumn key={column.id} id={column.id!.toString()} title={column.title} count={column.tasks.length} onAddClick={() => handleAddTask({ columnId: column.id! })}>
                         {column.tasks.map(task => (
                             <KanbanTask key={task.id} id={task.id} data={{ ...task, columnId: column.id!.toString() }}>
                                 <KanbanTaskCardMemo {...task} />
@@ -214,6 +220,7 @@ const KanbanClientComponent = ({ userId }: { userId: string }) => {
                     </KanbanColumn>
                 ))}
             </KanbanBoard>
+            <AddTaskDialog open={isAddDialogOpen} columnId={selectedColumnId} />
             <EditTaskDialog
                 open={isEditDialogOpen}
             />

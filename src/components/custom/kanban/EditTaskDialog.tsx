@@ -1,30 +1,34 @@
 'use client';
 import { addOrUpdateTask } from '@/actions/DashboardActions';
+import EditorComp from '@/components/EditorComponent';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Drawer, DrawerClose, DrawerContent, DrawerDescription, DrawerFooter, DrawerHeader, DrawerTitle } from '@/components/ui/drawer';
+import { Drawer, DrawerClose, DrawerContent, DrawerFooter, DrawerHeader, DrawerTitle } from '@/components/ui/drawer';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
+import SelectBox from '@/components/ui/select-box';
+import { Separator } from '@/components/ui/separator';
+import { TooltipContent, TooltipProvider, TooltipTrigger, Tooltip } from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
 import { useKanbanStore } from '@/store/kanbanStore';
+import { useMediaQuery } from '@/utils/hooks';
 import { kanbanColumns } from '@/utils/kanbanColumns';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { COMPLETED_COLUMN, Task } from '@root/types';
 import { format } from 'date-fns';
 import dayjs from 'dayjs';
-import { CalendarIcon, CircleHelp } from 'lucide-react';
-import { Suspense, useEffect, useRef, useState } from 'react';
+import { CalendarIcon, CircleHelp, Info } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { z } from 'zod';
-import { COMPLETED_COLUMN } from '@root/types';
-import EditorComp from '@/components/EditorComponent';
-import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
-import { Separator } from '@/components/ui/separator';
-import { useMediaQuery } from '@/utils/hooks';
+import { Lock } from 'lucide-react';
 
 interface EditTaskDialogProps {
     open: boolean;
@@ -37,6 +41,12 @@ const FormSchema = z.object({
     endDate: z.date().optional(),
     completed: z.boolean(),
     columnId: z.union([z.number().nullable(), z.string()]),
+    dependencies: z.array(
+        z.object({
+            dependentTaskId: z.number(),
+            dependencyType: z.enum(['blockedBy']),
+        })
+    ).optional(),
 });
 
 const EditTaskDialog = ({ open }: EditTaskDialogProps) => {
@@ -45,9 +55,13 @@ const EditTaskDialog = ({ open }: EditTaskDialogProps) => {
     const task = useKanbanStore((state) => state.getTaskById(selectedTaskId));
     const setIsEditDialogOpen = useKanbanStore((state) => state.setIsEditDialogOpen);
     const setSelectedTaskId = useKanbanStore((state) => state.setSelectedTaskId);
+    const isTaskBlocked = useKanbanStore((state) => state.isTaskBlocked);
+
+    const allTasks = useKanbanStore((state) => state.tasks);
 
     const [isPending, setIsPending] = useState(false);
     const [completed, setCompleted] = useState(task?.completed ?? false);
+    const [taskBlocked, setTaskBlocked] = useState<Task[]>([]);
 
     const form = useForm<z.infer<typeof FormSchema>>({
         resolver: zodResolver(FormSchema),
@@ -58,6 +72,7 @@ const EditTaskDialog = ({ open }: EditTaskDialogProps) => {
             endDate: undefined,
             completed: false,
             columnId: null,
+            dependencies: [],
         },
     });
 
@@ -71,7 +86,6 @@ const EditTaskDialog = ({ open }: EditTaskDialogProps) => {
 
     const handleOnClose = () => {
         setIsEditDialogOpen(false);
-        //setSelectedTaskId(null);
         reset();
     };
 
@@ -88,9 +102,21 @@ const EditTaskDialog = ({ open }: EditTaskDialogProps) => {
                 endDate: task.endDate?.toDate(),
                 completed: task.completed ?? false,
                 columnId: task.columnId ?? null,
+                dependencies: task.dependencies ?? [],
             });
+
+            const blockedBy = isTaskBlocked(task.id);
+            setTaskBlocked(blockedBy);
         }
     }, [task, reset, open]);
+
+    useEffect(() => {
+        return () => {
+            setSelectedTaskId(null);
+            reset();
+            setIsEditDialogOpen(false);
+        }
+    }, [reset]);
 
     useEffect(() => {
         if (completed) {
@@ -118,6 +144,7 @@ const EditTaskDialog = ({ open }: EditTaskDialogProps) => {
             completedDate: (completed && task.completedDate === null) ? dayjs().toISOString() : null,
             completed: data.completed,
             columnId: data.columnId === null || data.columnId === '' ? null : Number(data.columnId),
+            dependencies: data.dependencies,
         };
 
         const { error } = await addOrUpdateTask(JSON.parse(JSON.stringify(updatedTask)));
@@ -131,6 +158,30 @@ const EditTaskDialog = ({ open }: EditTaskDialogProps) => {
             handleOnClose();
         }
     };
+
+    const renderTaskBlocked = () => {
+        if (taskBlocked.length > 0) {
+            return (
+                <Tooltip>
+                    <TooltipTrigger>
+                        <Badge variant="warning" className='flex gap-1 text-xs w-min'><Lock className='w-4 h-4' /> Blocked</Badge>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                        <>
+                            <h6 className='text-sm'>Blocked by</h6>
+                            <ul className='text-xs list-disc ml-4'>
+                                {taskBlocked.map(task => (
+                                    <li key={task.id}>{task.title}</li>
+                                ))}
+                            </ul>
+                        </>
+                    </TooltipContent>
+                </Tooltip>
+            );
+        }
+    };
+
+    const isBlocked = taskBlocked.length > 0;
 
     const renderContent = () => (
         <>
@@ -170,7 +221,6 @@ const EditTaskDialog = ({ open }: EditTaskDialogProps) => {
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>
-
                         )}
                     />
                     <div className="flex flex-col md:flex-row md:space-x-4">
@@ -190,6 +240,7 @@ const EditTaskDialog = ({ open }: EditTaskDialogProps) => {
                                                             'w-full pl-3 text-left font-normal',
                                                             !field.value && 'text-muted-foreground'
                                                         )}
+                                                        disabled={isBlocked}
                                                     >
                                                         {field.value ? (
                                                             format(field.value, 'PPP')
@@ -230,6 +281,7 @@ const EditTaskDialog = ({ open }: EditTaskDialogProps) => {
                                                             'w-full pl-3 text-left font-normal',
                                                             !field.value && 'text-muted-foreground'
                                                         )}
+                                                        disabled={isBlocked}
                                                     >
                                                         {field.value ? (
                                                             format(field.value, 'PPP')
@@ -267,8 +319,8 @@ const EditTaskDialog = ({ open }: EditTaskDialogProps) => {
                                         <Button
                                             variant="outline"
                                             className="w-full justify-start"
-                                            onClick={() => !completed && setPopoverOpen(true)}
-                                            disabled={completed}
+                                            onClick={() => !completed && !isBlocked && setPopoverOpen(true)}
+                                            disabled={completed || isBlocked}
                                         >
                                             {selectedColumn ? (
                                                 <>
@@ -282,7 +334,7 @@ const EditTaskDialog = ({ open }: EditTaskDialogProps) => {
                                             )}
                                         </Button>
                                     </PopoverTrigger>
-                                    {!completed && (
+                                    {!completed && !isBlocked && (
                                         <PopoverContent className="p-0" align="center">
                                             <Command>
                                                 <CommandInput placeholder="Change column..." />
@@ -329,31 +381,125 @@ const EditTaskDialog = ({ open }: EditTaskDialogProps) => {
                             </FormItem>
                         )}
                     />
+                    <FormField
+                        control={form.control}
+                        name="dependencies"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel className='flex'>Dependencies
+                                    <Tooltip>
+                                        <TooltipTrigger asChild>
+                                            <Info className='ml-1 h-4 w-4' />
+                                        </TooltipTrigger>
+                                        <TooltipContent>Dependencies are tasks that must be completed before this task can be started.</TooltipContent>
+                                    </Tooltip>
+                                </FormLabel>
+                                <SelectBox
+                                    options={allTasks
+                                        .filter((t) => t.id !== task?.id)
+                                        .map((t) => ({
+                                            label: t.title,
+                                            value: t.id?.toString() || '',
+                                        }))}
+                                    value={(field.value || [])
+                                        .map((dep) => dep.dependentTaskId)
+                                        .filter((id) => id !== undefined && id !== null)
+                                        .map((id) => id.toString())}
+                                    onChange={(value) => {
+                                        const valueArray = Array.isArray(value) ? value : [value];
+
+                                        const newDependencies = valueArray
+                                            .filter((v) => v)
+                                            .map((v) => ({
+                                                dependentTaskId: parseInt(v, 10),
+                                                dependencyType: 'blockedBy',
+                                            }));
+                                        field.onChange(newDependencies);
+                                    }}
+                                    placeholder='Select dependencies'
+                                    multiple
+                                />
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
                 </div>
                 <ScrollBar orientation='vertical' />
             </ScrollArea>
             <Separator />
-
         </>
     );
 
     if (isDesktop) {
         return (
             <Dialog open={open} onOpenChange={handleOnClose}>
-                {task ? "Task" : "No Task Selected"}
-                <DialogContent onPointerDown={(e) => e.stopPropagation()} className='p-0'>
-                    <DialogHeader className='pt-6 px-6'>
-                        <DialogTitle>{task ? 'Edit Task' : 'No Task Selected'}</DialogTitle>
-                        {task && (
-                            <DialogDescription>
-                                Created on: {dayjs(task.created).format('MMMM D, YYYY')}
-                            </DialogDescription>
-                        )}
-                    </DialogHeader>
+                <TooltipProvider>
+                    <DialogContent onPointerDown={(e) => e.stopPropagation()} className='p-0'>
+                        <DialogHeader className='pt-6 px-6'>
+                            <DialogTitle>{task ? 'Edit Task' : 'No Task Selected'}</DialogTitle>
+                            {task && (
+                                <DialogDescription>
+                                    Created on: {dayjs(task.created).format('MMMM D, YYYY')}
+                                </DialogDescription>
+                            )}
+                        </DialogHeader>
+                        <Form {...form}>
+                            <form onSubmit={form.handleSubmit(handleSave)} className="space-y-4">
+                                {renderContent()}
+                                <DialogFooter className='gap-4 flex-col sm:gap-2 pb-6 px-6'>
+                                    <FormField
+                                        control={form.control}
+                                        name="completed"
+                                        render={({ field }) => (
+                                            <FormItem className="flex items-center space-x-2 space-y-0 mr-auto">
+                                                <FormControl>
+                                                    <Checkbox
+                                                        checked={field.value}
+                                                        onCheckedChange={(checked) => {
+                                                            setCompleted(checked === "indeterminate" ? false : checked);
+                                                            field.onChange(checked);
+                                                        }}
+                                                        disabled={isBlocked}
+                                                    />
+                                                </FormControl>
+                                                <FormLabel className='m-0'>Completed</FormLabel>
+                                            </FormItem>
+                                        )}
+                                    />
+                                    {renderTaskBlocked()}
+                                    <Button type="submit" disabled={isPending} className={cn(isPending && "opacity-50 cursor-not-allowed")}>
+                                        {isPending ? "Saving..." : "Save"}
+                                    </Button>
+                                    <DialogClose asChild>
+                                        <Button variant="outline" onClick={handleOnClose} disabled={isPending}>
+                                            Cancel
+                                        </Button>
+                                    </DialogClose>
+                                </DialogFooter>
+                            </form>
+                        </Form>
+                    </DialogContent>
+                </TooltipProvider>
+            </Dialog>
+        );
+    }
+
+    return (
+        <Drawer open={open} onOpenChange={handleOnClose}>
+            <TooltipProvider>
+                <DrawerContent className="max-w-full">
+                    <DrawerHeader className="pt-6 px-6">
+                        <DrawerTitle className='flex flex-col items-center gap-2'><span>Edit task</span>{renderTaskBlocked()}</DrawerTitle>
+                        <DialogDescription>
+                            {task && `Created on: ${dayjs(task.created).format('MMMM D, YYYY')}`}
+                        </DialogDescription>
+                    </DrawerHeader>
+                    <Separator />
                     <Form {...form}>
                         <form onSubmit={form.handleSubmit(handleSave)} className="space-y-4">
                             {renderContent()}
-                            <DialogFooter className='gap-4 flex-col sm:gap-2 pb-6 px-6'>
+
+                            <DrawerFooter className='gap-4 flex-col sm:gap-2 pb-6 px-6'>
                                 <FormField
                                     control={form.control}
                                     name="completed"
@@ -366,6 +512,7 @@ const EditTaskDialog = ({ open }: EditTaskDialogProps) => {
                                                         setCompleted(checked === "indeterminate" ? false : checked);
                                                         field.onChange(checked);
                                                     }}
+                                                    disabled={isBlocked}
                                                 />
                                             </FormControl>
                                             <FormLabel className='m-0'>Completed</FormLabel>
@@ -375,63 +522,14 @@ const EditTaskDialog = ({ open }: EditTaskDialogProps) => {
                                 <Button type="submit" disabled={isPending} className={cn(isPending && "opacity-50 cursor-not-allowed")}>
                                     {isPending ? "Saving..." : "Save"}
                                 </Button>
-                                <DialogClose asChild>
-                                    <Button variant="outline" onClick={handleOnClose} disabled={isPending}>
-                                        Cancel
-                                    </Button>
-                                </DialogClose>
-                            </DialogFooter>
+                                <DrawerClose asChild>
+                                    <Button variant="outline" onClick={() => setIsEditDialogOpen(false)}>Cancel</Button>
+                                </DrawerClose>
+                            </DrawerFooter>
                         </form>
                     </Form>
-                </DialogContent>
-            </Dialog>
-        );
-    }
-
-
-    return (
-        <Drawer open={open} onOpenChange={handleOnClose}>
-            <DrawerContent className="max-w-full">
-                <DrawerHeader className="pt-6 px-6">
-                    <DrawerTitle>Edit task</DrawerTitle>
-                    <DialogDescription>
-                        {task && `Created on: ${dayjs(task.created).format('MMMM D, YYYY')}`}
-                    </DialogDescription>
-                </DrawerHeader>
-                <Separator />
-                <Form {...form}>
-                    <form onSubmit={form.handleSubmit(handleSave)} className="space-y-4">
-                        {renderContent()}
-
-                        <DrawerFooter className='gap-4 flex-col sm:gap-2 pb-6 px-6'>
-                            <FormField
-                                control={form.control}
-                                name="completed"
-                                render={({ field }) => (
-                                    <FormItem className="flex items-center space-x-2 space-y-0 mr-auto">
-                                        <FormControl>
-                                            <Checkbox
-                                                checked={field.value}
-                                                onCheckedChange={(checked) => {
-                                                    setCompleted(checked === "indeterminate" ? false : checked);
-                                                    field.onChange(checked);
-                                                }}
-                                            />
-                                        </FormControl>
-                                        <FormLabel className='m-0'>Completed</FormLabel>
-                                    </FormItem>
-                                )}
-                            />
-                            <Button type="submit" disabled={isPending} className={cn(isPending && "opacity-50 cursor-not-allowed")}>
-                                {isPending ? "Saving..." : "Save"}
-                            </Button>
-                            <DrawerClose asChild>
-                                <Button variant="outline" onClick={() => setIsEditDialogOpen(false)}>Cancel</Button>
-                            </DrawerClose>
-                        </DrawerFooter>
-                    </form>
-                </Form>
-            </DrawerContent>
+                </DrawerContent>
+            </TooltipProvider>
         </Drawer>
     );
 };

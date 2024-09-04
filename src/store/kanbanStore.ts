@@ -1,5 +1,4 @@
 import { Task } from '@root/types';
-import dayjs from 'dayjs';
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 
@@ -13,8 +12,10 @@ interface KanbanState {
     setIsEditDialogOpen: (isOpen: boolean) => void;
     setIsDeleteDialogOpen: (isOpen: boolean) => void;
     changeTask: (eventType: string, newTask?: Task, oldTask?: Task) => void;
+    changeDependency: (eventType: string, newDependency?: any, oldDependency?: any) => void;
     setSelectedTaskId: (id: number | null) => void;
     getTaskById: (taskId: number | null) => Task | undefined;
+    isTaskBlocked: (taskId: number | null) => Task[];
 }
 
 export const useKanbanStore = create<KanbanState>()(
@@ -77,8 +78,68 @@ export const useKanbanStore = create<KanbanState>()(
 
                     set({ tasks: updatedTasks });
                 },
+                changeDependency: (eventType, newDependency, oldDependency) => {
+                    const { tasks } = get();
+                    let updatedTasks: Task[] = [...tasks];
+
+                    switch (eventType) {
+                        case 'INSERT':
+                        case 'UPDATE':
+                            updatedTasks = updatedTasks.map(task => {
+                                if (task.id === newDependency.taskId) {
+                                    return {
+                                        ...task,
+                                        dependencies: [
+                                            ...(task.dependencies || []).filter(dep => dep.dependentTaskId !== newDependency.dependentTaskId),
+                                            newDependency
+                                        ]
+                                    };
+                                }
+                                return task;
+                            });
+                            break;
+                        case 'DELETE':
+                            updatedTasks = updatedTasks.map(task => {
+                                if (task.id === oldDependency.taskId) {
+                                    return {
+                                        ...task,
+                                        dependencies: (task.dependencies || []).filter(dep => dep.dependentTaskId !== oldDependency.dependentTaskId)
+                                    };
+                                }
+                                return task;
+                            });
+                            break;
+                        default:
+                            break;
+                    }
+
+                    updatedTasks.sort((a, b) => {
+                        if (!a.endDate) return 1;
+                        if (!b.endDate) return -1;
+                        return a.endDate!.diff(b.endDate!);
+                    });
+
+                    set({ tasks: updatedTasks });
+                },
                 setSelectedTaskId: (id) => set({ selectedTaskId: id }),
                 getTaskById: (taskId) => get().tasks.find(task => task.id === taskId),
+
+                isTaskBlocked: (taskId) => {
+                    const task = get().getTaskById(taskId);
+                    if (!task || !task.dependencies) return [];
+
+                    const blockedBy = task.dependencies.filter(dep => dep.dependencyType === 'blockedBy');
+                    let blocked: Task[] = [];
+
+                    blockedBy.forEach(dep => {
+                        const dependentTask = get().getTaskById(dep.dependentTaskId);
+                        if (dependentTask && !dependentTask.completed) {
+                            blocked.push(dependentTask);
+                        }
+                    });
+
+                    return blocked;
+                },
             }),
             { name: 'kanbanStore' },
         ),

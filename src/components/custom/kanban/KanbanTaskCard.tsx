@@ -10,13 +10,13 @@ import { useKanbanStore } from '@/store/kanbanStore';
 import { Task } from '@root/types';
 import { getDateColor, getDateText } from '@/utils/functions';
 import dayjs from 'dayjs';
-import { Clock, EllipsisVertical, Eye, Trash } from 'lucide-react';
+import { Clock, EllipsisVertical, Eye, Lock, Trash } from 'lucide-react';
 import { memo, useMemo } from 'react';
 
 type BadgeTypes = "default" | "secondary" | "destructive" | "outline" | "warning" | "success" | "error" | null | undefined;
 
-const KanbanTaskCard = ({ id, title, startDate, endDate, description, completed, completedDate }: Task) => {
-    const { setIsDeleteDialogOpen, setIsEditDialogOpen, setSelectedTaskId } = useKanbanStore();
+const KanbanTaskCard = ({ id, title, startDate, endDate, description, completed, completedDate, dependencies }: Task) => {
+    const { setIsDeleteDialogOpen, setIsEditDialogOpen, setSelectedTaskId, isTaskBlocked } = useKanbanStore();
 
     const dropdownItems = useMemo(() => {
         return [
@@ -54,6 +54,14 @@ const KanbanTaskCard = ({ id, title, startDate, endDate, description, completed,
             text: getDateText({ start, end })
         };
     }, [startDate, endDate, completed, completedDate]);
+
+    const blockedBy = useMemo(() => {
+        if (!dependencies) return [];
+        const blockedBy = dependencies.filter(dep => dep.dependencyType === 'blockedBy');
+        if (blockedBy.length === 0) return [];
+        return isTaskBlocked(id);
+
+    }, [dependencies]);
 
     return (
         <TooltipProvider>
@@ -113,9 +121,29 @@ const KanbanTaskCard = ({ id, title, startDate, endDate, description, completed,
                         }
                     </CardContent>}
 
-                {dateConfig && (
-                    <CardFooter className="flex justify-between items-center gap-2 p-3">
-                        <Badge variant={dateConfig.color} className='flex gap-1 text-xs'><Clock className='w-4 h-4' /> {dateConfig.text}</Badge>
+                {(dateConfig || blockedBy.length > 0) && (
+                    <CardFooter className="flex items-center gap-2 p-3">
+                        {
+                            dateConfig && <Badge variant={dateConfig.color} className='flex gap-1 text-xs'><Clock className='w-4 h-4' /> {dateConfig.text}</Badge>
+                        }
+                        {blockedBy.length > 0 &&
+                            <Tooltip>
+                                <TooltipTrigger>
+                                    <Badge variant="warning" className='flex gap-1 text-xs'><Lock className='w-4 h-4' /> Blocked</Badge>
+
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                    <>
+                                        <h6 className='text-sm'>Blocked by</h6>
+                                        <ul className='text-xs list-disc ml-4'>
+                                            {blockedBy.map(task => (
+                                                <li key={task.id}>{task.title}</li>
+                                            ))}
+                                        </ul>
+                                    </>
+                                </TooltipContent>
+                            </Tooltip>
+                        }
                     </CardFooter>
                 )}
             </Card>
@@ -132,6 +160,7 @@ export const KanbanTaskCardMemo = memo(KanbanTaskCard, (prevProps, nextProps) =>
         prevProps.startDate === nextProps.startDate &&
         prevProps.endDate === nextProps.endDate &&
         prevProps.userId === nextProps.userId &&
-        prevProps.updated === nextProps.updated
+        prevProps.updated === nextProps.updated &&
+        prevProps.dependencies === nextProps.dependencies
     );
 });

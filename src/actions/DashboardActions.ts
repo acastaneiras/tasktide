@@ -3,10 +3,16 @@ import { createClient } from "@/utils/supabase/server";
 
 export async function addOrUpdateTask(task: any) {
     const supabase = createClient();
-    const { data, error } = await supabase
-        .from('tasks')
-        .upsert(task);
-    return { data, error }
+    const { data, error } = await supabase.rpc('upsert_task_with_dependencies', {
+        task_data: task
+    });
+
+    if (error) {
+        console.error('Error:', error);
+        return { data: null, error };
+    }
+
+    return { data, error: null };
 }
 
 export async function deleteTask(taskId: number) {
@@ -17,14 +23,3 @@ export async function deleteTask(taskId: number) {
         .eq('id', taskId);
     return { data, error }
 }
-
-export async function fetchTasks(userId: string) {
-    const supabase = createClient();
-    const { data, error } = await supabase
-        .from('tasks')
-        .select('*')
-        .eq('userId', userId)
-        .order('endDate', { ascending: true });
-
-    return { data, error };
-};

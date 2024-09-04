@@ -9,9 +9,9 @@ import KanbanTask from '@/components/custom/kanban/KanbanTask'
 import { KanbanTaskCardMemo } from '@/components/custom/kanban/KanbanTaskCard'
 import NoTasks from '@/components/custom/kanban/NoTasks'
 import { DragEndEvent } from '@dnd-kit/core'
-import { Column, COMPLETED_COLUMN, Task } from '@root/types'
+import { Column, COMPLETED_COLUMN, Task, TaskDependencyRecord } from '@root/types'
 import { toast } from 'sonner'
-import { addOrUpdateTask, deleteTask, fetchTasks } from '@/actions/DashboardActions'
+import { addOrUpdateTask, deleteTask } from '@/actions/DashboardActions'
 import { kanbanColumns } from '@/utils/kanbanColumns'
 import { useKanbanStore } from '@/store/kanbanStore'
 import { createClient } from '@/utils/supabase/client'
@@ -19,33 +19,40 @@ import dayjs from 'dayjs'
 import KanbanColumnSkeleton from './KanbanColumnSkeleton'
 
 
-const KanbanClientComponent = ({userId}: {userId: string}) => {
+const KanbanClientComponent = ({ userId }: { userId: string }) => {
     const supabase = createClient();
     const columns = kanbanColumns as Column[];
-    const { tasks, setTasks, changeTask, isDeleteDialogOpen, isEditDialogOpen, setIsDeleteDialogOpen, setIsEditDialogOpen, selectedTaskId } = useKanbanStore();
+    const { tasks, setTasks, changeTask, isDeleteDialogOpen, isEditDialogOpen, setIsDeleteDialogOpen, changeDependency, selectedTaskId } = useKanbanStore();
     const [loading, setLoading] = useState(true);
-    
+
     useEffect(() => {
         const callFetch = async () => {
             setLoading(true);
-            const {data, error} = await fetchTasks(userId);
+            const { data, error } = await supabase
+                .from('tasks')
+                .select('*, task_dependencies_taskid_fkey(dependentTaskId, dependencyType)')
+                .eq('userId', userId)
+                .order('endDate', { ascending: true });
             if (error) {
+                console.log(error)
                 toast.error('Error fetching tasks');
                 return;
             }
-            const tasks = (data as Task[]).map(task => ({
+
+            const tasks = (data as any[]).map(task => ({
                 ...task,
                 startDate: task.startDate ? dayjs(task.startDate) : undefined,
                 endDate: task.endDate ? dayjs(task.endDate) : undefined,
-                completedDate: task.completedDate ? dayjs(task.completedDate) : null
+                completedDate: task.completedDate ? dayjs(task.completedDate) : null,
+                dependencies: task.task_dependencies_taskid_fkey || [],
             }));
             setTasks(tasks);
             setLoading(false);
         };
         callFetch();
-    }, [userId, setTasks]);
+    }, [userId, setTasks, supabase]);
 
-    
+
     useEffect(() => {
         const tasksSubscription = supabase.channel('tasks-public')
             .on(
@@ -65,10 +72,31 @@ const KanbanClientComponent = ({userId}: {userId: string}) => {
                 }
             )
             .subscribe();
+
+        const dependencyChangesSubscription = supabase.channel('dependencies-public')
+            .on(
+                'postgres_changes',
+                { event: '*', schema: 'public', table: 'task_dependencies' },
+                (payload) => {
+                    const { eventType, new: newDependency, old: oldDependency } = payload;
+                    const dependency: TaskDependencyRecord = newDependency as TaskDependencyRecord;
+                    const oldDependencyData: TaskDependencyRecord = oldDependency as TaskDependencyRecord;
+
+                    const isTaskOwnedByUser = (taskId: number) => {
+                        return tasks.some(task => task.id === taskId && task.userId === userId);
+                    };
+
+                    if (dependency && (isTaskOwnedByUser(dependency.taskId) || eventType === 'DELETE')) {
+                        changeDependency(eventType, dependency, oldDependencyData);
+                    }
+                }
+            )
+            .subscribe();
         return () => {
             supabase.removeChannel(tasksSubscription);
+            supabase.removeChannel(dependencyChangesSubscription);
         };
-    }, [supabase, changeTask, userId]);
+    }, [supabase, tasks, changeTask, changeDependency, userId]);
 
     const handleOnDragEnd = async (event: DragEndEvent) => {
         let columnId = event.over?.id as undefined | string | null;
@@ -92,6 +120,7 @@ const KanbanClientComponent = ({userId}: {userId: string}) => {
         if (parseInt(columnId!) === COMPLETED_COLUMN) {
             updatedTask.completed = true;
             updatedTask.completedDate = dayjs();
+            console.log('Task completed', updatedTask);
         } else {
             updatedTask.completed = false;
             updatedTask.completedDate = null;
@@ -147,19 +176,19 @@ const KanbanClientComponent = ({userId}: {userId: string}) => {
 
     if (loading) {
         return (
-          <section className='h-full flex-1'>
-              <div className='relative flex flex-col w-full h-full'>
-                <div className='w-full h-[100%] flex flex-row p-8 overflow-x-auto horizontal-scroll'>
-                  <KanbanColumnSkeleton />
-                  {columns.map(column => (
-                    <KanbanColumnSkeleton key={column.id} />
-                  ))}
+            <section className='h-full flex-1'>
+                <div className='relative flex flex-col w-full h-full'>
+                    <div className='w-full h-[100%] flex flex-row p-8 overflow-x-auto horizontal-scroll'>
+                        <KanbanColumnSkeleton />
+                        {columns.map(column => (
+                            <KanbanColumnSkeleton key={column.id} />
+                        ))}
+                    </div>
                 </div>
-              </div>
-          </section>
+            </section>
         )
-      }
-      
+    }
+
     return (
         <KanbanBoardContainer>
             <KanbanBoard onDragEnd={handleOnDragEnd}>

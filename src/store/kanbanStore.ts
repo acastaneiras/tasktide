@@ -100,14 +100,12 @@ export const useKanbanStore = create<KanbanState>()(
                             break;
                         case 'DELETE':
                             updatedTasks = updatedTasks.map(task => {
-                                if (task.id === oldDependency.taskId) {
-                                    return {
-                                        ...task,
-                                        dependencies: (task.dependencies || []).filter(dep => dep.dependentTaskId !== oldDependency.dependentTaskId)
-                                    };
-                                }
-                                return task;
+                                return {
+                                    ...task,
+                                    dependencies: (task.dependencies || []).filter(dep => dep.dependentTaskId !== oldDependency.dependentTaskId)
+                                };
                             });
+                            updatedTasks = updatedTasks.filter(task => task.id !== oldDependency.taskId);
                             break;
                         default:
                             break;

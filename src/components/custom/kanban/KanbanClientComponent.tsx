@@ -85,7 +85,6 @@ const KanbanClientComponent = ({ userId }: { userId: string }) => {
                     const isTaskOwnedByUser = (taskId: number) => {
                         return tasks.some(task => task.id === taskId && task.userId === userId);
                     };
-
                     if (dependency && (isTaskOwnedByUser(dependency.taskId) || eventType === 'DELETE')) {
                         changeDependency(eventType, dependency, oldDependencyData);
                     }

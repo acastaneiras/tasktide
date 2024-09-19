@@ -61,7 +61,7 @@ const KanbanTaskCard = ({ id, title, startDate, endDate, description, completed,
         if (blockedBy.length === 0) return [];
         return isTaskBlocked(id);
 
-    }, [dependencies]);
+    }, [dependencies, id, isTaskBlocked]);
 
     return (
         <TooltipProvider>
@@ -82,7 +82,7 @@ const KanbanTaskCard = ({ id, title, startDate, endDate, description, completed,
                                     <EllipsisVertical className='w-4 h-4' />
                                 </Button>
                             </DropdownMenuTrigger>
-                            <DropdownMenuContent>
+                            <DropdownMenuContent align='end'>
                                 <DropdownMenuGroup>
                                     {dropdownItems.map(item => (
                                         <DropdownMenuItem key={item.label} onPointerDown={(e) => { e.stopPropagation(); }} onClick={(e) => { e.stopPropagation(); item.onClick(); }}

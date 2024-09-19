@@ -1,21 +1,35 @@
+import { deleteProject } from '@/actions/DashboardActions';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Drawer, DrawerClose, DrawerContent, DrawerFooter, DrawerHeader, DrawerTitle } from '@/components/ui/drawer';
 import { Separator } from '@/components/ui/separator';
 import { useKanbanStore } from '@/store/kanbanStore';
 import { useMediaQuery } from '@/utils/hooks';
+import { toast } from 'sonner';
 
-type DeleteTaskDialogProps = {
+type DeleteProjectDialogProps = {
     open: boolean;
-    onClose: () => void;
-    onDelete: () => void;
 };
 
-const DeleteTaskDialog = ({ open, onClose, onDelete }: DeleteTaskDialogProps) => {
-    const selectedTaskId = useKanbanStore((state) => state.selectedTaskId);
-    const task = useKanbanStore((state) => state.getTaskById(selectedTaskId));
+const DeleteProjectDialog = ({ open }: DeleteProjectDialogProps) => {
+    const { selectedEditProject, setIsDeleteProjectDialogOpen, selectedProjectId, setSelectedProjectId } = useKanbanStore();
 
     const isDesktop = useMediaQuery("(min-width: 768px)");
+
+    const onClose = () => {
+        setIsDeleteProjectDialogOpen(false);
+    }
+
+    const onDelete = async () => {
+        if (!selectedEditProject) return;
+        const { data, error } = await deleteProject(selectedEditProject.id!);
+        if (error) {
+            toast.error('Failed to delete project');
+        } else {            
+            toast.success('Project deleted successfully');
+        }
+        onClose();
+    }
 
     if (isDesktop) {
         return (
@@ -23,14 +37,14 @@ const DeleteTaskDialog = ({ open, onClose, onDelete }: DeleteTaskDialogProps) =>
                 <DialogContent>
                     <DialogHeader>
                         <DialogTitle className='mt-2'>
-                            {task ? `Are you sure you want to delete the task "${task.title}"?` : "No task selected"}
+                            {selectedEditProject ? `Are you sure you want to delete the project "${selectedEditProject.name}"?` : "No project selected"}
                         </DialogTitle>
                     </DialogHeader>
                     <DialogDescription>
-                        {task ? "This action cannot be undone." : "Please select a task to delete."}
+                        {selectedEditProject ? "This action cannot be undone." : "Please select a project to delete."}
                     </DialogDescription>
                     <DialogFooter className='gap-2'>
-                        {task && (
+                        {selectedEditProject && (
                             <DialogClose asChild>
                                 <Button variant='destructive' onClick={onDelete}>Delete</Button>
                             </DialogClose>
@@ -49,15 +63,15 @@ const DeleteTaskDialog = ({ open, onClose, onDelete }: DeleteTaskDialogProps) =>
             <DrawerContent className="max-w-full">
                 <DrawerHeader>
                     <DrawerTitle>
-                        {task ? `Are you sure you want to delete the task "${task.title}"?` : "No task selected"}
+                        {selectedEditProject ? `Are you sure you want to delete the project "${selectedEditProject.name}"?` : "No project selected"}
                     </DrawerTitle>
                     <DialogDescription>
-                        {task ? "This action cannot be undone." : "Please select a task to delete."}
+                        {selectedEditProject ? "This action cannot be undone." : "Please select a project to delete."}
                     </DialogDescription>
                 </DrawerHeader>
                 <Separator />
                 <DrawerFooter className="gap-2">
-                    {task && (
+                    {selectedEditProject && (
                         <DrawerClose asChild>
                             <Button variant="destructive" onClick={onDelete}>
                                 Delete
@@ -75,4 +89,4 @@ const DeleteTaskDialog = ({ open, onClose, onDelete }: DeleteTaskDialogProps) =>
     );
 };
 
-export default DeleteTaskDialog;
+export default DeleteProjectDialog;

@@ -23,3 +23,22 @@ export async function deleteTask(taskId: number) {
         .eq('id', taskId);
     return { data, error }
 }
+
+export async function addOrUpdateProject(project: any) {
+    const supabase = createClient();
+    console.log(project);
+    const { data, error } = await supabase.rpc('upsert_project', {
+        project_data: project
+    });
+
+    return { data, error: null };
+}
+
+export async function deleteProject(projectId: number) {
+    const supabase = createClient();
+    const { data, error } = await supabase
+        .from('projects')
+        .delete()
+        .eq('id', projectId);
+    return { data, error }
+}

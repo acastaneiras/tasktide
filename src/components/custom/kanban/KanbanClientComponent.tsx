@@ -1,5 +1,5 @@
 'use client'
-import React, { useEffect, useMemo, useState } from 'react'
+import { addOrUpdateTask, deleteTask } from '@/actions/DashboardActions'
 import DeleteTaskDialog from '@/components/custom/kanban/DeleteTaskDialog'
 import EditTaskDialog from '@/components/custom/kanban/EditTaskDialog'
 import KanbanBoard from '@/components/custom/kanban/KanbanBoard'
@@ -8,23 +8,24 @@ import KanbanColumn from '@/components/custom/kanban/KanbanColumn'
 import KanbanTask from '@/components/custom/kanban/KanbanTask'
 import { KanbanTaskCardMemo } from '@/components/custom/kanban/KanbanTaskCard'
 import NoTasks from '@/components/custom/kanban/NoTasks'
-import { DragEndEvent } from '@dnd-kit/core'
-import { Column, COMPLETED_COLUMN, Task, TaskDependencyRecord } from '@root/types'
-import { toast } from 'sonner'
-import { addOrUpdateTask, deleteTask } from '@/actions/DashboardActions'
-import { kanbanColumns } from '@/utils/kanbanColumns'
 import { useKanbanStore } from '@/store/kanbanStore'
+import { kanbanColumns } from '@/utils/kanbanColumns'
 import { createClient } from '@/utils/supabase/client'
+import { DragEndEvent } from '@dnd-kit/core'
+import { Column, COMPLETED_COLUMN, Project, Task, TaskDependencyRecord } from '@root/types'
 import dayjs from 'dayjs'
-import KanbanColumnSkeleton from './KanbanColumnSkeleton'
-import { set } from 'date-fns'
+import { useEffect, useMemo, useState } from 'react'
+import { toast } from 'sonner'
 import AddTaskDialog from './AddTaskDialog'
+import KanbanColumnSkeleton from './KanbanColumnSkeleton'
+import ProjectDialog from './ProjectDialog'
+import DeleteProjectDialog from './DeleteProjectDialog'
 
 
 const KanbanClientComponent = ({ userId }: { userId: string }) => {
     const supabase = createClient();
     const columns = kanbanColumns as Column[];
-    const { tasks, setTasks, changeTask, isDeleteDialogOpen, isEditDialogOpen, setIsDeleteDialogOpen, changeDependency, selectedTaskId, setSelectedTaskId, setIsAddDialogOpen, isAddDialogOpen } = useKanbanStore();
+    const { tasks, isDeleteProjectDialogOpen, selectedProjectId, selectedEditProject, changeProject, setSelectedProjectId, setTasks, setProjects, changeTask, isDeleteDialogOpen, isEditDialogOpen, isProjectDialogOpen, setIsDeleteDialogOpen, changeDependency, selectedTaskId, setSelectedTaskId, setIsAddDialogOpen, isAddDialogOpen } = useKanbanStore();
     const [loading, setLoading] = useState(true);
     const [selectedColumnId, setSelectedColumnId] = useState<number | null>(null);
 
@@ -37,7 +38,6 @@ const KanbanClientComponent = ({ userId }: { userId: string }) => {
                 .eq('userId', userId)
                 .order('endDate', { ascending: true });
             if (error) {
-                console.log(error)
                 toast.error('Error fetching tasks');
                 return;
             }
@@ -49,11 +49,29 @@ const KanbanClientComponent = ({ userId }: { userId: string }) => {
                 completedDate: task.completedDate ? dayjs(task.completedDate) : null,
                 dependencies: task.task_dependencies_taskid_fkey || [],
             }));
+
+            const { data: responseData, error: fetchError } = await supabase
+                .from('projects')
+                .select('*')
+                .eq('userId', userId);
+
+            if (fetchError) {
+                toast.error('Error fetching projects');
+                return;
+            }
+
+            const projects = responseData || [];
+
+            if (projects.length > 0) {
+                setSelectedProjectId(projects[0].id);
+            }
+
+            setProjects(projects);
             setTasks(tasks);
             setLoading(false);
         };
         callFetch();
-    }, [userId, setTasks, supabase]);
+    }, [userId, setTasks, setProjects, setSelectedProjectId, supabase]);
 
 
     useEffect(() => {
@@ -94,11 +112,27 @@ const KanbanClientComponent = ({ userId }: { userId: string }) => {
                 }
             )
             .subscribe();
+
+        const projectsSubscription = supabase.channel('projects-public')
+            .on(
+                'postgres_changes',
+                { event: '*', schema: 'public', table: 'projects', filter: `userId=eq.${userId}` },
+                (payload) => {
+                    const { eventType, new: comingProject, old: prevProject } = payload;
+
+                    const newProject = comingProject as Project;
+                    const oldProject = prevProject as Project;
+
+                    changeProject(eventType, newProject, oldProject);
+                }
+            )
+            .subscribe();
         return () => {
             supabase.removeChannel(tasksSubscription);
             supabase.removeChannel(dependencyChangesSubscription);
+            supabase.removeChannel(projectsSubscription);
         };
-    }, [supabase, tasks, changeTask, changeDependency, userId]);
+    }, [supabase, tasks, changeTask, changeDependency, userId, changeProject]);
 
     const handleOnDragEnd = async (event: DragEndEvent) => {
         let columnId = event.over?.id as undefined | string | null;
@@ -122,7 +156,6 @@ const KanbanClientComponent = ({ userId }: { userId: string }) => {
         if (parseInt(columnId!) === COMPLETED_COLUMN) {
             updatedTask.completed = true;
             updatedTask.completedDate = dayjs();
-            console.log('Task completed', updatedTask);
         } else {
             updatedTask.completed = false;
             updatedTask.completedDate = null;
@@ -149,35 +182,37 @@ const KanbanClientComponent = ({ userId }: { userId: string }) => {
         setIsDeleteDialogOpen(false);
     };
 
-    const handleAddTask = async (args: { columnId: number | null }) => { 
+    const handleAddTask = async (args: { columnId: number | null }) => {
         setSelectedTaskId(null);
         setSelectedColumnId(args.columnId);
         setIsAddDialogOpen(true);
     };
 
     const taskColumns = useMemo(() => {
+        const filteredTasks = tasks.filter(task => task.projectId === selectedProjectId);
+
         const taskColumns = columns.map(column => {
-            const columnTasks = tasks.filter(task => task?.columnId === column.id) || []
+            const columnTasks = filteredTasks.filter(task => task?.columnId === column.id) || []
             return {
                 ...column,
                 tasks: columnTasks
             }
-        })
+        });
 
-        if (!tasks.length) {
+        if (!filteredTasks.length) {
             return {
                 unassignedColumn: [],
                 columns: taskColumns
-            }
+            };
         }
 
-        const unassignedColumn = tasks.filter(task => !task.columnId)
+        const unassignedColumn = filteredTasks.filter(task => !task.columnId);
 
         return {
             unassignedColumn,
             columns: taskColumns
-        }
-    }, [columns, tasks])
+        };
+    }, [columns, tasks, selectedProjectId]);
 
     if (loading) {
         return (
@@ -220,6 +255,8 @@ const KanbanClientComponent = ({ userId }: { userId: string }) => {
                     </KanbanColumn>
                 ))}
             </KanbanBoard>
+            <ProjectDialog open={isProjectDialogOpen} project={selectedEditProject} />
+            <DeleteProjectDialog open={isDeleteProjectDialogOpen} />
             <AddTaskDialog open={isAddDialogOpen} columnId={selectedColumnId} />
             <EditTaskDialog
                 open={isEditDialogOpen}

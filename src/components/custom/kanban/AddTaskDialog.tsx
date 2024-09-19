@@ -51,6 +51,7 @@ const FormSchema = z.object({
 const AddTaskDialog = ({ open, columnId }: AddTaskDialogProps) => {
     const editorRef = useRef(null);
     const setIsAddDialogOpen = useKanbanStore((state) => state.setIsAddDialogOpen);
+    const selectedProjectId = useKanbanStore((state) => state.selectedProjectId);
 
     const allTasks = useKanbanStore((state) => state.tasks);
 
@@ -118,6 +119,7 @@ const AddTaskDialog = ({ open, columnId }: AddTaskDialogProps) => {
             completed: data.completed,
             columnId: data.columnId === null || data.columnId === '' ? null : Number(data.columnId),
             dependencies: data.dependencies,
+            projectId: selectedProjectId,
         };
 
         const { error } = await addOrUpdateTask(JSON.parse(JSON.stringify(newTask)));

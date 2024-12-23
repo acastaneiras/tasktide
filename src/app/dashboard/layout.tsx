@@ -1,6 +1,7 @@
 import { logout } from '@/actions/AuthActions'
 import AdminPanelLayout from '@/components/admin-panel/admin-panel-layout'
 import { SheetMenu } from '@/components/admin-panel/sheet-menu'
+import ProfileButton from '@/components/custom/ProfileButton'
 import ThemeSwitcher from '@/components/custom/ThemeSwitcher'
 import { Button } from '@/components/ui/button'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuSub, DropdownMenuSubTrigger, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
@@ -31,13 +32,12 @@ export default async function DashboardLayout({ children }: { children: React.Re
 
     return (
         <AdminPanelLayout>
-     
             <main className='overflow-hidden bg-background h-full'>
                 <div className="flex flex-col h-full">
                     <div className="border-b shadow-sm">
                         <div className="flex h-16 items-center px-4 justify-between">
                             <div className="text-lg font-semibold">
-                            <SheetMenu />
+                                <SheetMenu />
                             </div>
                             <div className="flex items-center space-x-4">
                                 <DropdownMenu>
@@ -62,10 +62,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
                                         <DropdownMenuLabel>User Settings</DropdownMenuLabel>
                                         <DropdownMenuSeparator />
                                         <DropdownMenuGroup>
-                                            <DropdownMenuItem>
-                                                <Settings className="mr-2 h-4 w-4" />
-                                                <span>Profile</span>
-                                            </DropdownMenuItem>
+                                                <ProfileButton />
                                             <DropdownMenuSub>
                                                 <DropdownMenuSubTrigger>
                                                     <Sun className="mr-2 h-4 w-4" />
@@ -88,7 +85,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
                             </div>
                         </div>
                     </div>
-                    
+
                     {children}
                 </div>
             </main>

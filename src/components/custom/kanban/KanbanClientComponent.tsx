@@ -20,12 +20,13 @@ import AddTaskDialog from './AddTaskDialog'
 import KanbanColumnSkeleton from './KanbanColumnSkeleton'
 import ProjectDialog from './ProjectDialog'
 import DeleteProjectDialog from './DeleteProjectDialog'
+import ProfileDialog from '../ProfileDialog'
 
 
 const KanbanClientComponent = ({ userId }: { userId: string }) => {
     const supabase = createClient();
     const columns = kanbanColumns as Column[];
-    const { tasks, isDeleteProjectDialogOpen, selectedProjectId, selectedEditProject, changeProject, setSelectedProjectId, setTasks, setProjects, changeTask, isDeleteDialogOpen, isEditDialogOpen, isProjectDialogOpen, setIsDeleteDialogOpen, changeDependency, selectedTaskId, setSelectedTaskId, setIsAddDialogOpen, isAddDialogOpen } = useKanbanStore();
+    const { tasks, isOpenProfileDialog, isDeleteProjectDialogOpen, selectedProjectId, selectedEditProject, changeProject, setSelectedProjectId, setTasks, setProjects, changeTask, isDeleteDialogOpen, isEditDialogOpen, isProjectDialogOpen, setIsDeleteDialogOpen, changeDependency, selectedTaskId, setSelectedTaskId, setIsAddDialogOpen, isAddDialogOpen } = useKanbanStore();
     const [loading, setLoading] = useState(true);
     const [selectedColumnId, setSelectedColumnId] = useState<number | null>(null);
 
@@ -255,6 +256,7 @@ const KanbanClientComponent = ({ userId }: { userId: string }) => {
                     </KanbanColumn>
                 ))}
             </KanbanBoard>
+            <ProfileDialog open={isOpenProfileDialog} />
             <ProjectDialog open={isProjectDialogOpen} project={selectedEditProject} />
             <DeleteProjectDialog open={isDeleteProjectDialogOpen} />
             <AddTaskDialog open={isAddDialogOpen} columnId={selectedColumnId} />

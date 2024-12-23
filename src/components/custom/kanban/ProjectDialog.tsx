@@ -2,7 +2,7 @@ import { addOrUpdateProject } from '@/actions/DashboardActions';
 import { Button } from '@/components/ui/button';
 import { ColorPicker } from '@/components/ui/color-picker';
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Drawer, DrawerClose, DrawerContent, DrawerFooter, DrawerHeader, DrawerTitle } from '@/components/ui/drawer';
+import { Drawer, DrawerClose, DrawerContent, DrawerDescription, DrawerFooter, DrawerHeader, DrawerTitle } from '@/components/ui/drawer';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -73,7 +73,7 @@ const ProjectDialog = ({ open, project }: ProjectDialogProps) => {
             const primaryColor = rootStyles.getPropertyValue('--primary');
             const [h, s, l] = primaryColor.replaceAll("%", "").split(' ').map(Number);
             const hexColor = hslToHex(h, s, l);
-    
+
             setProjectColor(project?.color || hexColor);
             reset({
                 name: project?.name || '',
@@ -126,10 +126,10 @@ const ProjectDialog = ({ open, project }: ProjectDialogProps) => {
                 <DialogContent className="p-0">
                     <DialogHeader className="px-6 pt-6">
                         <DialogTitle>{project ? 'Edit Project' : 'Add New Project'}</DialogTitle>
+                        <DialogDescription>
+                            {project ? 'Edit the details of your project below.' : 'Fill out the information below to create a new project.'}
+                        </DialogDescription>
                     </DialogHeader>
-                    <DialogDescription className="px-6">
-                        {project ? 'Edit the details of your project below.' : 'Fill out the information below to create a new project.'}
-                    </DialogDescription>
                     <Separator />
                     <Form {...form}>
                         <form onSubmit={handleSubmit(handleSave)} className="space-y-4">
@@ -159,6 +159,7 @@ const ProjectDialog = ({ open, project }: ProjectDialogProps) => {
                     <DrawerTitle className='flex flex-col items-center gap-2'>
                         {project ? 'Edit Project' : 'Add New Project'}
                     </DrawerTitle>
+                    <DrawerDescription/>
                 </DrawerHeader>
                 <Separator />
                 <Form {...form}>

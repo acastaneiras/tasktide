@@ -1,7 +1,7 @@
 import { deleteProject } from '@/actions/DashboardActions';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Drawer, DrawerClose, DrawerContent, DrawerFooter, DrawerHeader, DrawerTitle } from '@/components/ui/drawer';
+import { Drawer, DrawerClose, DrawerContent, DrawerDescription, DrawerFooter, DrawerHeader, DrawerTitle } from '@/components/ui/drawer';
 import { Separator } from '@/components/ui/separator';
 import { useKanbanStore } from '@/store/kanbanStore';
 import { useMediaQuery } from '@/utils/hooks';
@@ -39,6 +39,7 @@ const DeleteProjectDialog = ({ open }: DeleteProjectDialogProps) => {
                         <DialogTitle className='mt-2'>
                             {selectedEditProject ? `Are you sure you want to delete the project "${selectedEditProject.name}"?` : "No project selected"}
                         </DialogTitle>
+                        <DialogDescription/>
                     </DialogHeader>
                     <DialogDescription>
                         {selectedEditProject ? "This action cannot be undone." : "Please select a project to delete."}
@@ -65,9 +66,9 @@ const DeleteProjectDialog = ({ open }: DeleteProjectDialogProps) => {
                     <DrawerTitle>
                         {selectedEditProject ? `Are you sure you want to delete the project "${selectedEditProject.name}"?` : "No project selected"}
                     </DrawerTitle>
-                    <DialogDescription>
+                    <DrawerDescription>
                         {selectedEditProject ? "This action cannot be undone." : "Please select a project to delete."}
-                    </DialogDescription>
+                    </DrawerDescription>
                 </DrawerHeader>
                 <Separator />
                 <DrawerFooter className="gap-2">

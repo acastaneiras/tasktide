@@ -6,7 +6,7 @@ import { Calendar } from '@/components/ui/calendar';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { Dialog, DialogClose, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Drawer, DrawerClose, DrawerContent, DrawerFooter, DrawerHeader, DrawerTitle } from '@/components/ui/drawer';
+import { Drawer, DrawerClose, DrawerContent, DrawerDescription, DrawerFooter, DrawerHeader, DrawerTitle } from '@/components/ui/drawer';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
@@ -19,6 +19,7 @@ import { useKanbanStore } from '@/store/kanbanStore';
 import { useMediaQuery } from '@/utils/hooks';
 import { kanbanColumns } from '@/utils/kanbanColumns';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { DialogDescription } from '@radix-ui/react-dialog';
 import { COMPLETED_COLUMN } from '@root/types';
 import { format } from 'date-fns';
 import dayjs from 'dayjs';
@@ -341,10 +342,13 @@ const AddTaskDialog = ({ open, columnId }: AddTaskDialogProps) => {
                                     </Tooltip>
                                 </FormLabel>
                                 <SelectBox
-                                    options={allTasks.map((t) => ({
-                                        label: t.title,
-                                        value: t.id?.toString() || '',
-                                    }))}
+                                    options={allTasks
+                                        .filter((t) => t.projectId === selectedProjectId)
+                                        .map((t) => ({
+                                            label: t.title,
+                                            value: t.id?.toString() || '',
+                                        }))
+                                    }
                                     value={(field.value || [])
                                         .map((dep) => dep.dependentTaskId)
                                         .filter((id) => id !== undefined && id !== null)
@@ -381,6 +385,7 @@ const AddTaskDialog = ({ open, columnId }: AddTaskDialogProps) => {
                     <DialogContent onPointerDown={(e) => e.stopPropagation()} className='p-0'>
                         <DialogHeader className='pt-6 px-6'>
                             <DialogTitle>Add New Task</DialogTitle>
+                            <DialogDescription/>
                         </DialogHeader>
                         <Form {...form}>
                             <form onSubmit={form.handleSubmit(handleSave)} className="space-y-4">
@@ -427,6 +432,7 @@ const AddTaskDialog = ({ open, columnId }: AddTaskDialogProps) => {
                 <DrawerContent className="max-w-full">
                     <DrawerHeader className="pt-6 px-6">
                         <DrawerTitle className='flex flex-col items-center gap-2'>Add New Task</DrawerTitle>
+                        <DrawerDescription/>
                     </DrawerHeader>
                     <Separator />
                     <Form {...form}>

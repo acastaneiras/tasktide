@@ -4,7 +4,7 @@ import PendingButton from '@/components/custom/PendingButton'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { zodResolver } from "@hookform/resolvers/zod"
 import { TriangleAlert } from "lucide-react"
@@ -23,7 +23,7 @@ export default function LoginPage() {
   //Generate a form with react-hook-form
   const form = useForm<z.infer<typeof schema>>({
     resolver: zodResolver(schema),
-    mode: 'onTouched',
+    mode: 'onSubmit',
     defaultValues: {
       email: '',
       password: '',
@@ -71,7 +71,7 @@ export default function LoginPage() {
                 <FormItem className="flex flex-col space-y-1.5">
                   <FormLabel>Email</FormLabel>
                   <FormControl>
-                    <Input type="email" {...field} required/>
+                    <Input type="email" {...field} required />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -86,17 +86,25 @@ export default function LoginPage() {
                   <FormControl>
                     <Input type="password" {...field} required />
                   </FormControl>
+                  <FormDescription>
+                    <div className="text-right">
+                      <Link href="/reset-password" className="text-sm hover:underline">
+                        Forgot your password?
+                      </Link>
+                    </div>
+                  </FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
             />
-            <PendingButton text="Sign in"/>
+
+            <PendingButton text="Sign in" />
           </form>
         </Form>
       </CardContent>
       <CardFooter>
         <p className='text-sm'>
-          You don&apos;t have an account? <Link href="/sign-up">Sign up</Link>
+          You don&apos;t have an account? <Link href="/sign-up" className='hover:underline'>Sign up</Link>
         </p>
       </CardFooter>
     </Card>

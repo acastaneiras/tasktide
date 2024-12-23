@@ -26,12 +26,13 @@ export async function deleteTask(taskId: number) {
 
 export async function addOrUpdateProject(project: any) {
     const supabase = createClient();
-    console.log(project);
     const { data, error } = await supabase.rpc('upsert_project', {
         project_data: project
     });
 
-    return { data, error: null };
+    console.log(error)
+
+    return { data, error };
 }
 
 export async function deleteProject(projectId: number) {

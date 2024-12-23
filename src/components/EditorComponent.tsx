@@ -1,22 +1,4 @@
-"use client";
-
-import { 
-    BoldItalicUnderlineToggles, 
-    CodeToggle, 
-    InsertThematicBreak, 
-    ListsToggle, 
-    MDXEditor, 
-    MDXEditorMethods, 
-    Separator, 
-    StrikeThroughSupSubToggles, 
-    UndoRedo, 
-    headingsPlugin, 
-    listsPlugin, 
-    markdownShortcutPlugin, 
-    quotePlugin, 
-    thematicBreakPlugin, 
-    toolbarPlugin 
-} from "@mdxeditor/editor";
+import { BoldItalicUnderlineToggles, CodeToggle, InsertThematicBreak, ListsToggle, MDXEditor, MDXEditorMethods, Separator, StrikeThroughSupSubToggles, UndoRedo, headingsPlugin, listsPlugin, markdownShortcutPlugin, quotePlugin, thematicBreakPlugin, toolbarPlugin } from "@mdxeditor/editor";
 import '@mdxeditor/editor/style.css';
 import { useTheme } from "next-themes";
 import { FC, useEffect, useState } from "react";
@@ -54,8 +36,8 @@ const Editor: FC<EditorProps> = ({ markdown, editorRef, onChange }) => {
                 markdownShortcutPlugin(),
                 toolbarPlugin({
                     toolbarContents: () => (
-                        <div className='flex flex-wrap overflow-x-auto'>
-                            <div className='flex items-center space-x-2'>
+                        <div className="w-full">
+                            <div className="flex flex-wrap items-center space-x-2 overflow-x-auto">
                                 <UndoRedo />
                                 <Separator className="border-secondary" />
                                 <BoldItalicUnderlineToggles />

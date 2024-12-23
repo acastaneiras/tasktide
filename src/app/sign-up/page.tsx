@@ -28,7 +28,7 @@ export default function SignUpPage() {
   //Generate a form with react-hook-form
   const form = useForm<z.infer<typeof schema>>({
     resolver: zodResolver(schema),
-    mode: 'onTouched',
+    mode: 'onSubmit',
     defaultValues: {
       displayName: '',
       email: '',
@@ -128,7 +128,7 @@ export default function SignUpPage() {
       </CardContent>
       <CardFooter>
         <p className='text-sm'>
-          Do you already have an account? <Link href="/sign-in">Sign in</Link>
+          Do you already have an account? <Link href="/sign-in" className='hover:underline'>Sign in</Link>
         </p>
       </CardFooter>
     </Card>

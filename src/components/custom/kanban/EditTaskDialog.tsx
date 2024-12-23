@@ -55,6 +55,7 @@ const EditTaskDialog = ({ open }: EditTaskDialogProps) => {
     const setIsEditDialogOpen = useKanbanStore((state) => state.setIsEditDialogOpen);
     const setSelectedTaskId = useKanbanStore((state) => state.setSelectedTaskId);
     const isTaskBlocked = useKanbanStore((state) => state.isTaskBlocked);
+    const selectedProjectId = useKanbanStore((state) => state.selectedProjectId);
 
     const allTasks = useKanbanStore((state) => state.tasks);
 
@@ -395,7 +396,7 @@ const EditTaskDialog = ({ open }: EditTaskDialogProps) => {
                                 </FormLabel>
                                 <SelectBox
                                     options={allTasks
-                                        .filter((t) => t.id !== task?.id)
+                                        .filter((t) => t.id !== task?.id && t.projectId === selectedProjectId)
                                         .map((t) => ({
                                             label: t.title,
                                             value: t.id?.toString() || '',
@@ -436,11 +437,9 @@ const EditTaskDialog = ({ open }: EditTaskDialogProps) => {
                     <DialogContent onPointerDown={(e) => e.stopPropagation()} className='p-0'>
                         <DialogHeader className='pt-6 px-6'>
                             <DialogTitle>{task ? 'Edit Task' : 'No Task Selected'}</DialogTitle>
-                            {task && (
-                                <DialogDescription>
-                                    Created on: {dayjs(task.created).format('MMMM D, YYYY')}
-                                </DialogDescription>
-                            )}
+                            <DialogDescription>
+                                {task && `Created on: ${dayjs(task.created).format('MMMM D, YYYY')}` }
+                            </DialogDescription>
                         </DialogHeader>
                         <Form {...form}>
                             <form onSubmit={form.handleSubmit(handleSave)} className="space-y-4">

@@ -1,13 +1,20 @@
 'use server'
 import KanbanClientComponent from '@/components/custom/kanban/KanbanClientComponent'
-
+import { createClient } from '@/utils/supabase/server';
+import { redirect } from 'next/navigation';
 
 export default async function TasksPage() {
-  const userId = process.env.NEXT_PUBLIC_DEV_USER_ID as string;
+  const supabase = createClient();
+  const { data: { user } } = await supabase.auth.getUser()
 
+  if (!user) {
+    redirect('/sign-in')
+  }
   return (
+
     <section className='h-full flex flex-1 bg-slate-50  dark:bg-foreground/5'>
-      <KanbanClientComponent userId={userId}/>
+      <KanbanClientComponent userId={user?.id!} />
     </section>
   )
+
 }

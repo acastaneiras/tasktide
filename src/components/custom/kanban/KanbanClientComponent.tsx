@@ -20,13 +20,13 @@ import AddTaskDialog from './AddTaskDialog'
 import KanbanColumnSkeleton from './KanbanColumnSkeleton'
 import ProjectDialog from './ProjectDialog'
 import DeleteProjectDialog from './DeleteProjectDialog'
-import ProfileDialog from '../ProfileDialog'
+import NoProjects from './NoProjects'
 
 
 const KanbanClientComponent = ({ userId }: { userId: string }) => {
     const supabase = createClient();
     const columns = kanbanColumns as Column[];
-    const { tasks, isOpenProfileDialog, isDeleteProjectDialogOpen, selectedProjectId, selectedEditProject, changeProject, setSelectedProjectId, setTasks, setProjects, changeTask, isDeleteDialogOpen, isEditDialogOpen, isProjectDialogOpen, setIsDeleteDialogOpen, changeDependency, selectedTaskId, setSelectedTaskId, setIsAddDialogOpen, isAddDialogOpen } = useKanbanStore();
+    const { tasks, projects, isDeleteProjectDialogOpen, selectedProjectId, selectedEditProject, changeProject, setSelectedProjectId, setTasks, setProjects, changeTask, isDeleteDialogOpen, isEditDialogOpen, isProjectDialogOpen, setIsDeleteDialogOpen, changeDependency, selectedTaskId, setSelectedTaskId, setIsAddDialogOpen, isAddDialogOpen } = useKanbanStore();
     const [loading, setLoading] = useState(true);
     const [selectedColumnId, setSelectedColumnId] = useState<number | null>(null);
 
@@ -231,32 +231,41 @@ const KanbanClientComponent = ({ userId }: { userId: string }) => {
     }
 
     return (
-        <KanbanBoardContainer>
-            <KanbanBoard onDragEnd={handleOnDragEnd}>
-                <KanbanColumn id="unassigned" title={"Unassigned"} count={taskColumns.unassignedColumn.length || 0} onAddClick={() => handleAddTask({ columnId: null })}>
-                    {taskColumns.unassignedColumn.map(task => (
-                        <KanbanTask key={task.id} id={task.id} data={{ ...task, columnId: 'unassigned' }} >
-                            <KanbanTaskCardMemo {...task} />
-                        </KanbanTask>
-                    ))}
-                    {!taskColumns.unassignedColumn.length && (
-                        <NoTasks />
-                    )}
-                </KanbanColumn>
-                {taskColumns.columns.map(column => (
-                    <KanbanColumn key={column.id} id={column.id!.toString()} title={column.title} count={column.tasks.length} onAddClick={() => handleAddTask({ columnId: column.id! })}>
-                        {column.tasks.map(task => (
-                            <KanbanTask key={task.id} id={task.id} data={{ ...task, columnId: column.id!.toString() }}>
-                                <KanbanTaskCardMemo {...task} />
-                            </KanbanTask>
-                        ))}
-                        {!column.tasks.length && (
-                            <NoTasks />
-                        )}
-                    </KanbanColumn>
-                ))}
-            </KanbanBoard>
-            <ProfileDialog open={isOpenProfileDialog} />
+        <>
+            {
+                projects.length > 0 ? (
+                    <KanbanBoardContainer>
+                        <KanbanBoard onDragEnd={handleOnDragEnd}>
+                            <KanbanColumn id="unassigned" title={"Unassigned"} count={taskColumns.unassignedColumn.length || 0} onAddClick={() => handleAddTask({ columnId: null })}>
+                                {taskColumns.unassignedColumn.map(task => (
+                                    <KanbanTask key={task.id} id={task.id} data={{ ...task, columnId: 'unassigned' }} >
+                                        <KanbanTaskCardMemo {...task} />
+                                    </KanbanTask>
+                                ))}
+                                {!taskColumns.unassignedColumn.length && (
+                                    <NoTasks />
+                                )}
+                            </KanbanColumn>
+                            {taskColumns.columns.map(column => (
+                                <KanbanColumn key={column.id} id={column.id!.toString()} title={column.title} count={column.tasks.length} onAddClick={() => handleAddTask({ columnId: column.id! })}>
+                                    {column.tasks.map(task => (
+                                        <KanbanTask key={task.id} id={task.id} data={{ ...task, columnId: column.id!.toString() }}>
+                                            <KanbanTaskCardMemo {...task} />
+                                        </KanbanTask>
+                                    ))}
+                                    {!column.tasks.length && (
+                                        <NoTasks />
+                                    )}
+                                </KanbanColumn>
+                            ))}
+                        </KanbanBoard>
+                    </KanbanBoardContainer>
+
+                ) : (
+                    <NoProjects />
+                )
+            }
+
             <ProjectDialog open={isProjectDialogOpen} project={selectedEditProject} />
             <DeleteProjectDialog open={isDeleteProjectDialogOpen} />
             <AddTaskDialog open={isAddDialogOpen} columnId={selectedColumnId} />
@@ -268,7 +277,7 @@ const KanbanClientComponent = ({ userId }: { userId: string }) => {
                 onClose={() => { setIsDeleteDialogOpen(false); }}
                 onDelete={handleRemoveTask}
             />
-        </KanbanBoardContainer>
+        </>
     )
 }
 

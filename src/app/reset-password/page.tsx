@@ -10,6 +10,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { TriangleAlert } from 'lucide-react';
 import Link from 'next/link';
+import {createClient} from '@/utils/supabase/client';
 
 const schema = z.object({
     email: z.string().email(),
@@ -18,7 +19,7 @@ const schema = z.object({
 export default function ResetPasswordPage() {
     const form = useForm<z.infer<typeof schema>>({
         resolver: zodResolver(schema),
-        mode: 'onTouched',
+        mode: 'onSubmit',
         defaultValues: {
             email: '',
         },
@@ -26,8 +27,12 @@ export default function ResetPasswordPage() {
 
     const [state, setState] = useState({ message: '', success: false });
 
-    const handleResetPassword = (data: z.infer<typeof schema>) => {
+    const handleResetPassword = async (data: z.infer<typeof schema>) => {
+        const supabase = createClient();
         setState({ message: 'If an account with that email exists, you will receive a password reset link.', success: true });
+        const { data: response, error } = await supabase.auth.resetPasswordForEmail(data.email, {
+            redirectTo: `${window.location.origin}/update-password`,
+        })
     };
 
     return (

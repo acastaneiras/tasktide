@@ -77,72 +77,79 @@ export function Menu({ isOpen }: MenuProps) {
             <p className="text-sm font-medium text-muted-foreground px-4 pb-2 max-w-[248px] truncate">
               Projects
             </p>
-            {projects.map((project, index) => (
-              <div key={index}>
-                <TooltipProvider disableHoverableContent>
-                  <Tooltip delayDuration={100}>
-                    <TooltipTrigger asChild>
-                      <div className="relative w-full">
-                        <Button
-                          variant="ghost"
-                          className="w-full justify-start h-10 mb-1"
-                          asChild
-                        >
-                          <div
-                            onClick={() => {
-                              setSelectedProjectId(project.id);
-                            }}
-                            className={cn(
-                              selectedProjectId === project.id ? "bg-accent" : "",
-                              "cursor-pointer inline-flex items-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground px-4 py-2 w-full justify-start h-10 mb-1"
-                            )}
+            {projects.length ? (
+              projects.map((project, index) => (
+                <div key={index}>
+                  <TooltipProvider disableHoverableContent>
+                    <Tooltip delayDuration={100}>
+                      <TooltipTrigger asChild>
+                        <div className="relative w-full">
+                          <Button
+                            variant="ghost"
+                            className="w-full justify-start h-10 mb-1"
+                            asChild
                           >
-                            <span className={cn(isOpen === false ? "" : "mr-4")}>
-                              <div
-                                className="w-3 h-3 rounded-full ml-1"
-                                style={{ backgroundColor: project.color }}
-                              ></div>
-                            </span>
-                            <p
+                            <div
+                              onClick={() => {
+                                setSelectedProjectId(project.id);
+                              }}
                               className={cn(
-                                "max-w-[200px] truncate",
-                                isOpen === false
-                                  ? "-translate-x-96 opacity-0"
-                                  : "translate-x-0 opacity-100 pr-2"
+                                selectedProjectId === project.id ? "bg-accent" : "",
+                                "cursor-pointer inline-flex items-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground px-4 py-2 w-full justify-start h-10 mb-1"
                               )}
                             >
-                              {project.name}
-                            </p>
-                          </div>
-                        </Button>
+                              <span className={cn(isOpen === false ? "" : "mr-4")}>
+                                <div
+                                  className="w-3 h-3 rounded-full ml-1"
+                                  style={{ backgroundColor: project.color }}
+                                ></div>
+                              </span>
+                              <p
+                                className={cn(
+                                  "max-w-[200px] truncate",
+                                  isOpen === false
+                                    ? "-translate-x-96 opacity-0"
+                                    : "translate-x-0 opacity-100 pr-2"
+                                )}
+                              >
+                                {project.name}
+                              </p>
+                            </div>
+                          </Button>
 
-                        {isOpen && (
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <button className="absolute right-0 mr-2 top-1/2 transform -translate-y-1/2 focus:outline-none">
-                                <EllipsisVertical className="w-5 h-5" />
-                              </button>
-                            </DropdownMenuTrigger>
+                          {isOpen && (
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <button className="absolute right-0 mr-2 top-1/2 transform -translate-y-1/2 focus:outline-none">
+                                  <EllipsisVertical className="w-5 h-5" />
+                                </button>
+                              </DropdownMenuTrigger>
 
-                            <DropdownMenuContent align="end">
-                              <DropdownMenuItem className={cn("flex items-center cursor-pointer gap-2 text-primary")} onClick={() => handleEdit(project.id)}>
-                                <Eye className='w-4 h-4' />View
-                              </DropdownMenuItem>
-                              <DropdownMenuItem className={cn("flex items-center cursor-pointer gap-2", "text-destructive dark:hover:text-primary hover:text-white hover:bg-destructive/90 focus:bg-destructive/90 focus:text-white")} onClick={() => handleDelete(project.id)}>
-                                <Trash className='w-4 h-4' /> Delete
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
-                        )}
-                      </div>
-                    </TooltipTrigger>
-                    {isOpen === false && (
-                      <TooltipContent side="right">{project.name}</TooltipContent>
-                    )}
-                  </Tooltip>
-                </TooltipProvider>
-              </div>
-            ))}
+                              <DropdownMenuContent align="end">
+                                <DropdownMenuItem className={cn("flex items-center cursor-pointer gap-2 text-primary")} onClick={() => handleEdit(project.id)}>
+                                  <Eye className='w-4 h-4' />View
+                                </DropdownMenuItem>
+                                <DropdownMenuItem className={cn("flex items-center cursor-pointer gap-2", "text-destructive dark:hover:text-primary hover:text-white hover:bg-destructive/90 focus:bg-destructive/90 focus:text-white")} onClick={() => handleDelete(project.id)}>
+                                  <Trash className='w-4 h-4' /> Delete
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          )}
+                        </div>
+                      </TooltipTrigger>
+                      {isOpen === false && (
+                        <TooltipContent side="right">{project.name}</TooltipContent>
+                      )}
+                    </Tooltip>
+                  </TooltipProvider>
+                </div>
+              ))
+            ) : (
+              <p className="text-sm font-medium text-muted-foreground px-4 pb-2 max-w-[248px] truncate">
+                No projects
+              </p>
+            )}
+
           </li>
         </ul>
       </nav>

@@ -1,7 +1,6 @@
 import { logout } from '@/actions/AuthActions'
 import AdminPanelLayout from '@/components/admin-panel/admin-panel-layout'
 import { SheetMenu } from '@/components/admin-panel/sheet-menu'
-import ProfileButton from '@/components/custom/ProfileButton'
 import ThemeSwitcher from '@/components/custom/ThemeSwitcher'
 import { Button } from '@/components/ui/button'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuSub, DropdownMenuSubTrigger, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
@@ -62,7 +61,6 @@ export default async function DashboardLayout({ children }: { children: React.Re
                                         <DropdownMenuLabel>User Settings</DropdownMenuLabel>
                                         <DropdownMenuSeparator />
                                         <DropdownMenuGroup>
-                                                <ProfileButton />
                                             <DropdownMenuSub>
                                                 <DropdownMenuSubTrigger>
                                                     <Sun className="mr-2 h-4 w-4" />

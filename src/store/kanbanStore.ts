@@ -15,8 +15,6 @@ interface KanbanState {
     isDeleteDialogOpen: boolean;
     selectedTaskId: number | null;
     breakPoint: number | null;
-    isOpenProfileDialog: boolean;
-    setIsOpenProfileDialog: (isOpen: boolean) => void;
     setSelectedProjectId: (id: number | null) => void;
     setTasks: (tasks: Task[]) => void;
     setProjects: (projects: Project[]) => void;
@@ -40,7 +38,6 @@ export const useKanbanStore = create<KanbanState>()(
             (set, get) => ({
                 tasks: [],
                 projects: [],
-                isOpenProfileDialog: false,
                 selectedProjectId: null,
                 selectedEditProject: null,
                 isProjectDialogOpen: false,
@@ -52,18 +49,6 @@ export const useKanbanStore = create<KanbanState>()(
                 selectedTaskId: null,
                 breakPoint: null,
                 setTasks: (tasks) => set({ tasks }),
-                setIsOpenProfileDialog: (isOpen: boolean) => {
-                    if (isOpen) {
-                        set({ isOpenProfileDialog: true, breakPoint: Date.now() });
-                    } else {
-                        const state = get();
-                        if (Date.now() - (state.breakPoint || 0) < 100) {
-                            set({ isOpenProfileDialog: true });
-                        } else {
-                            set({ isOpenProfileDialog: false });
-                        }
-                    }
-                },
                 setSelectedProjectId: (id) => set({ selectedProjectId: id }),
                 setSelectedEditProject: (project: any) => set({ selectedEditProject: project }),
                 setProjects: (projects) => {

@@ -3,7 +3,9 @@ import "./globals.css";
 import { cn } from "@root/lib/utils";
 import { Toaster } from "@/components/ui/sonner"
 import { ThemeProvider } from "@/components/theme-provider"
+import { Bricolage_Grotesque } from "next/font/google";
 
+const Grotesque = Bricolage_Grotesque({ subsets: ["latin"] });
 
 
 export const metadata: Metadata = {
@@ -18,7 +20,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={cn(`flex flex-col h-screen`)}>
+      <body className={cn(`${Grotesque.className} flex flex-col h-screen`)}>
         <ThemeProvider
           attribute="class"
           defaultTheme="system"

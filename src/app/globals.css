@@ -1,9 +1,3 @@
-@import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;700&display=swap');
-
-:root {
-  --font-sans: Bricolage Grotesque;
-  --font-display: ;
-}
 @tailwind base;
 @tailwind components;
 @tailwind utilities;

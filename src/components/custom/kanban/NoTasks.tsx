@@ -1,4 +1,4 @@
-import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert'
+import { Alert, AlertTitle, AlertDescription } from '@/src/components/ui/alert'
 import { BadgeInfoIcon } from 'lucide-react'
 import React from 'react'
 

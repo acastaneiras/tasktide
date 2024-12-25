@@ -23,11 +23,7 @@
       }
     ],
     "paths": {
-      "@/*": ["./src/*"],
-      "@components/*": ["./src/components/*"],
-      "@actions/*": ["./src/actions/*"],
-      "@root/*": ["./*"],
-      "@/lib/*": ["./lib/*"],
+      "@/*": ["*"]
     }
   },
   "include": [

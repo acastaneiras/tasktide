@@ -1,4 +1,4 @@
-import { Project, Task } from '@root/types';
+import { Project, Task } from '@/types';
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 

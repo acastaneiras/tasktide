@@ -1,5 +1,5 @@
 "use client";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/src/components/ui/button";
 import { StepBackIcon } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 

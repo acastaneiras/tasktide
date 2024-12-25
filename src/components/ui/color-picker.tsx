@@ -2,16 +2,16 @@
 
 import { forwardRef, useMemo, useState } from 'react';
 import { HexColorPicker } from 'react-colorful';
-import { cn } from '@/lib/utils';
+import { cn } from '@/lib/utils';;
 import { useForwardedRef } from '@/lib/use-forwarded-ref';
-import type { ButtonProps } from '@/components/ui/button';
-import { Button } from '@/components/ui/button';
+import type { ButtonProps } from '@/src/components/ui/button';
+import { Button } from '@/src/components/ui/button';
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from '@/components/ui/popover';
-import { Input } from '@/components/ui/input';
+} from '@/src/components/ui/popover';
+import { Input } from '@/src/components/ui/input';
 
 interface ColorPickerProps {
   value: string;

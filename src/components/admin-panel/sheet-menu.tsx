@@ -1,8 +1,8 @@
 import Link from "next/link";
 import { MenuIcon, PanelsTopLeft } from "lucide-react";
 
-import { Button } from "@/components/ui/button";
-import { Menu } from "@/components/admin-panel/menu";
+import { Button } from "@/src/components/ui/button";
+import { Menu } from "@/src/components/admin-panel/menu";
 import {
   Sheet,
   SheetHeader,
@@ -10,7 +10,7 @@ import {
   SheetTrigger,
   SheetTitle,
   SheetDescription
-} from "@/components/ui/sheet";
+} from "@/src/components/ui/sheet";
 
 export function SheetMenu() {
   return (

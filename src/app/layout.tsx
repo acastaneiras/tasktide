@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { cn } from "@root/lib/utils";
-import { Toaster } from "@/components/ui/sonner"
-import { ThemeProvider } from "@/components/theme-provider"
+import { cn } from "@/lib/utils";
+import { Toaster } from "@/src/components/ui/sonner"
+import { ThemeProvider } from "@/src/components/theme-provider"
 import { Bricolage_Grotesque } from "next/font/google";
 
 const Grotesque = Bricolage_Grotesque({ subsets: ["latin"] });

@@ -1,5 +1,5 @@
 "use client"
-import { DropdownMenuItem, DropdownMenuSubContent } from '@/components/ui/dropdown-menu'
+import { DropdownMenuItem, DropdownMenuSubContent } from '@/src/components/ui/dropdown-menu'
 import { Monitor, Moon, Sun } from 'lucide-react'
 import { useTheme } from 'next-themes'
 

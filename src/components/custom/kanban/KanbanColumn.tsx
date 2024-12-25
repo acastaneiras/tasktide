@@ -1,10 +1,10 @@
 'use client'
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { cn } from '@/lib/utils';
-import { kanbanColumns } from '@/utils/kanbanColumns';
+import { Badge } from '@/src/components/ui/badge';
+import { Button } from '@/src/components/ui/button';
+import { ScrollArea } from '@/src/components/ui/scroll-area';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/src/components/ui/tooltip';
+import { cn } from '@/lib/utils';;
+import { kanbanColumns } from '@/src/utils/kanbanColumns';
 import { useDroppable, UseDroppableArguments } from '@dnd-kit/core';
 import { CircleHelp, CirclePlus } from 'lucide-react';
 import React from 'react';

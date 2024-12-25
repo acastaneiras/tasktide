@@ -1,4 +1,4 @@
-import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
+import { ScrollArea, ScrollBar } from '@/src/components/ui/scroll-area'
 import React from 'react'
 
 const KanbanBoardContainer = ({ children }: React.PropsWithChildren) => {

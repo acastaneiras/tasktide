@@ -1,10 +1,10 @@
 "use client";
-import PendingButton from '@/components/custom/PendingButton'
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
-import { Input } from '@/components/ui/input'
-import { createClient } from '@/utils/supabase/client'
+import PendingButton from '@/src/components/custom/PendingButton'
+import { Alert, AlertDescription, AlertTitle } from "@/src/components/ui/alert"
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/src/components/ui/card"
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/src/components/ui/form'
+import { Input } from '@/src/components/ui/input'
+import { createClient } from '@/src/utils/supabase/client'
 import { zodResolver } from "@hookform/resolvers/zod"
 import { TriangleAlert } from "lucide-react"
 import Link from "next/link"

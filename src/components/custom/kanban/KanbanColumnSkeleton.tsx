@@ -1,4 +1,4 @@
-import { Skeleton } from "@/components/ui/skeleton";
+import { Skeleton } from "@/src/components/ui/skeleton";
 
 const KanbanColumnSkeleton = () => (
   <div className='flex flex-col px-4 min-w-[22rem] h-full w-full'>

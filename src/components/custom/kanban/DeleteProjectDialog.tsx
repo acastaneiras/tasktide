@@ -1,10 +1,10 @@
-import { deleteProject } from '@/actions/DashboardActions';
-import { Button } from '@/components/ui/button';
-import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Drawer, DrawerClose, DrawerContent, DrawerDescription, DrawerFooter, DrawerHeader, DrawerTitle } from '@/components/ui/drawer';
-import { Separator } from '@/components/ui/separator';
-import { useKanbanStore } from '@/store/kanbanStore';
-import { useMediaQuery } from '@/utils/hooks';
+import { deleteProject } from '@/src/actions/DashboardActions';
+import { Button } from '@/src/components/ui/button';
+import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/src/components/ui/dialog';
+import { Drawer, DrawerClose, DrawerContent, DrawerDescription, DrawerFooter, DrawerHeader, DrawerTitle } from '@/src/components/ui/drawer';
+import { Separator } from '@/src/components/ui/separator';
+import { useKanbanStore } from '@/src/store/kanbanStore';
+import { useMediaQuery } from '@/src/utils/hooks';
 import { toast } from 'sonner';
 
 type DeleteProjectDialogProps = {

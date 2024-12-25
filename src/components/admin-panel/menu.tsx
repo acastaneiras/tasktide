@@ -1,10 +1,10 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Button } from "@/src/components/ui/button";
+import { ScrollArea } from "@/src/components/ui/scroll-area";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/src/components/ui/tooltip";
 import { cn } from "@/lib/utils";
-import { useKanbanStore } from "@/store/kanbanStore";
+import { useKanbanStore } from "@/src/store/kanbanStore";
 import { EllipsisVertical, Eye, Plus, Trash } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../ui/dropdown-menu";
 import { set } from "date-fns";

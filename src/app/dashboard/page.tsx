@@ -1,6 +1,6 @@
 'use server'
-import KanbanClientComponent from '@/components/custom/kanban/KanbanClientComponent'
-import { createClient } from '@/utils/supabase/server';
+import KanbanClientComponent from '@/src/components/custom/kanban/KanbanClientComponent'
+import { createClient } from '@/src/utils/supabase/server';
 import { redirect } from 'next/navigation';
 
 export default async function TasksPage() {

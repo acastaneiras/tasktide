@@ -1,9 +1,18 @@
+@import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;700&display=swap');
+
+:root {
+  --font-sans: Bricolage Grotesque;
+  --font-display: ;
+}
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+
+
 @layer base {
   :root {
+    --gradient: linear-gradient(to top right,#383838,#000);
     --background: 0 0% 100%;
     --foreground: 222.2 84% 4.9%;
     --card: 0 0% 100%;
@@ -34,8 +43,8 @@
     --success: 38 92% 50%;
     --success-foreground: 48 96% 89%;
   }
-
   .dark {
+    --gradient: linear-gradient(to top right,#c5c5c5,#fff);
     --background: 222.2 84% 4.9%;
     --foreground: 210 40% 98%;
     --card: 222.2 84% 4.9%;

@@ -29,9 +29,6 @@ export async function addOrUpdateProject(project: any) {
     const { data, error } = await supabase.rpc('upsert_project', {
         project_data: project
     });
-
-    console.log(error)
-
     return { data, error };
 }
 

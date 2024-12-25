@@ -1,13 +1,13 @@
 'use client'
-import { login, loginWithGoogle } from '@/actions/AuthActions'
+import { loginWithGoogle, signup } from '@/actions/AuthActions'
 import PendingButton from '@/components/custom/PendingButton'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { zodResolver } from "@hookform/resolvers/zod"
-import { TriangleAlert } from "lucide-react"
+import { TriangleAlert } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useFormState } from 'react-dom'
@@ -15,43 +15,49 @@ import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 
 const schema = z.object({
+  displayName: z.string().min(3),
   email: z.string().email(),
-  password: z.string(),
+  password: z.string().min(8),
+  confirmPassword: z.string().min(8),
+}).refine(data => data.password === data.confirmPassword, {
+  message: 'Passwords do not match',
+  path: ['confirmPassword'],
 });
 
-export default function LoginPage() {
+export default function SignUpPage() {
   //Generate a form with react-hook-form
   const form = useForm<z.infer<typeof schema>>({
     resolver: zodResolver(schema),
     mode: 'onSubmit',
     defaultValues: {
+      displayName: '',
       email: '',
       password: '',
+      confirmPassword: '',
     }
   });
-  //Login action
-  const [state, formAction] = useFormState(login, { message: '' })
 
+  //Signup action
+  const [state, formAction] = useFormState(signup, { success: false, message: '' })
 
   return (
     <Card className="w-full md:w-1/3">
       <CardHeader>
-        <CardTitle>Sign in</CardTitle>
+        <CardTitle>Create your account</CardTitle>
         <CardDescription>to continue to TaskTide</CardDescription>
       </CardHeader>
       <CardContent>
         <div className='flex flex-col gap-4 '>
-
-          {state.message && (
-            <Alert variant="destructive">
+          {(state.message) && (
+            <Alert variant={state.success ? `success` : `destructive`}>
               <TriangleAlert className="h-4 w-4" />
-              <AlertTitle>Error</AlertTitle>
+              <AlertTitle>{state.success ? `Success!` : `Error`}</AlertTitle>
               <AlertDescription>
                 {state.message}
               </AlertDescription>
             </Alert>
           )}
-          <Button className='flex w-full justify-center gap-3' onClick={() => loginWithGoogle()}>
+          <Button className='flex w-full justify-center gap-3 border-2 border-border' variant={`secondary`} onClick={() => loginWithGoogle()}>
             <Image src="/google_logo.png" alt="Google logo" width={20} height={20} />
             Continue with Google
           </Button>
@@ -64,6 +70,19 @@ export default function LoginPage() {
         </div>
         <Form {...form}>
           <form className="grid w-full items-center gap-4" action={formAction}>
+            <FormField
+              control={form.control}
+              name="displayName"
+              render={({ field }) => (
+                <FormItem className="flex flex-col space-y-1.5">
+                  <FormLabel>Username</FormLabel>
+                  <FormControl>
+                    <Input {...field} required />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
             <FormField
               control={form.control}
               name="email"
@@ -86,25 +105,30 @@ export default function LoginPage() {
                   <FormControl>
                     <Input type="password" {...field} required />
                   </FormControl>
-                  <FormDescription>
-                    <div className="text-right">
-                      <Link href="/reset-password" className="text-sm hover:underline">
-                        Forgot your password?
-                      </Link>
-                    </div>
-                  </FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
             />
-
-            <PendingButton text="Sign in" />
+            <FormField
+              control={form.control}
+              name="confirmPassword"
+              render={({ field }) => (
+                <FormItem className="flex flex-col space-y-1.5">
+                  <FormLabel>Confirm Password</FormLabel>
+                  <FormControl>
+                    <Input type="password" {...field} required />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <PendingButton text="Sign up" />
           </form>
         </Form>
       </CardContent>
       <CardFooter>
         <p className='text-sm'>
-          You don&apos;t have an account? <Link href="/sign-up" className='hover:underline'>Sign up</Link>
+          Do you already have an account? <Link href="/sign-in" className='hover:underline'>Sign in</Link>
         </p>
       </CardFooter>
     </Card>

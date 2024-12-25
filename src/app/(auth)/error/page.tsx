@@ -1,9 +1,10 @@
 "use client";
+import { Suspense } from "react";
 import { Button } from "@/src/components/ui/button";
 import { StepBackIcon } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 
-export default function ErrorPage() {
+function ErrorContent() {
     const searchParams = useSearchParams();
     const message = searchParams.get("message") || "An unexpected error occurred.";
     const error = searchParams.get("error");
@@ -41,5 +42,13 @@ export default function ErrorPage() {
                 </a>
             </Button>
         </>
+    );
+}
+
+export default function ErrorPage() {
+    return (
+        <Suspense fallback={<div>Loading...</div>}>
+            <ErrorContent />
+        </Suspense>
     );
 }

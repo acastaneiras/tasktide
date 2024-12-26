@@ -20,7 +20,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={cn(`${Grotesque.className} flex flex-col h-screen`)}>
+      <body className={cn(`${Grotesque.className} flex flex-col h-screen`)} vaul-drawer-wrapper="true">
         <ThemeProvider
           attribute="class"
           defaultTheme="system"

@@ -1,36 +1,42 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# TaskTide
+A simple Kanban board application built with Next.js & Tailwind CSS.
 
-## Getting Started
+## Technology Stack
 
-First, run the development server:
+- **Frontend**: [Next.js](https://nextjs.org/) + [React](https://react.dev/) + [TypeScript](https://www.typescriptlang.org/)
+- **Styling**: [Tailwind CSS](https://tailwindcss.com/) + [shadcn/ui](https://ui.shadcn.com/)
+- **Database**: [Supabase](https://supabase.com/)
+- **Drag-and-Drop**: [dnd-kit](https://dndkit.com/)
+- **Form Validation**: [React Hook Form](https://www.react-hook-form.com/) + [Zod](https://zod.dev/)
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## Installation
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+If you want to run this yourself you can do it like so:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Prerequisites
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+- [Node.js](https://nodejs.org/) >= 21.x
 
-## Learn More
+### Steps
 
-To learn more about Next.js, take a look at the following resources:
+1. **Clone the Repository**:
+   ```bash
+   git clone https://github.com/your-username/tasktide.git
+   cd tasktide
+   ```
+2. **Set Up Environment Variables**: 
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+   Copy the ```.env.default``` file and rename it to ```.env``` and fill in the required variables.
+3. **Install dependencies**:
+   ```bash
+   npm install
+   ```
+3. **Run development server**:
+   ```bash
+   npm run dev
+   ```
+   or build the application with:
+   ```bash
+   npm run build && npm run start
+   ```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.

@@ -8,7 +8,6 @@ import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, For
 import { Input } from '@/src/components/ui/input'
 import { zodResolver } from "@hookform/resolvers/zod"
 import { TriangleAlert } from "lucide-react"
-import Image from 'next/image'
 import Link from 'next/link'
 import { useFormState } from 'react-dom'
 import { useForm } from 'react-hook-form'
@@ -52,7 +51,7 @@ export default function LoginPage() {
             </Alert>
           )}
           <Button className='flex w-full justify-center gap-3 border-2 border-border' variant={`secondary`} onClick={() => loginWithGoogle()}>
-            <Image src="/google_logo.png" alt="Google logo" width={20} height={20} />
+            <img src="/google_logo.png" alt="Google logo" width={20} height={20} />
             Continue with Google
           </Button>
         </div>

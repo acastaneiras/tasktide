@@ -5,30 +5,20 @@ import ThemeSwitcher from '@/src/components/custom/ThemeSwitcher'
 import { Button } from '@/src/components/ui/button'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuSub, DropdownMenuSubTrigger, DropdownMenuTrigger } from '@/src/components/ui/dropdown-menu'
 import { createClient } from '@/src/utils/supabase/server'
-import { ChevronDown, LogOut, Settings, Sun } from 'lucide-react'
-import Image from 'next/image'
+import { ChevronDown, LogOut, Sun } from 'lucide-react'
+import { redirect } from 'next/navigation'
 import React from 'react'
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
     let isOauthUser = false
     const supabase = createClient();
-    //UNCOMMENT THIS ON PRODUCTION
-    /*const { data, error } = await supabase.auth.getUser()
+    const { data, error } = await supabase.auth.getUser()
     if (error || !data?.user) {
         redirect('/sign-in')
     } else if (data?.user.app_metadata.providers.includes('google')) {
         isOauthUser = true
-    }*/
-    const data = {
-        user: {
-            email: 'test',
-            user_metadata: {
-                name: 'Test User',
-                picture: 'https://www.gravatar.com/avatar/205e460b479e2e5b48aec07710c08d50'
-            }
-        }
     }
-
+    console.log(data.user.user_metadata)
     return (
         <AdminPanelLayout>
             <main className='overflow-hidden bg-background h-full'>
@@ -43,7 +33,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
                                     <DropdownMenuTrigger asChild>
                                         <Button variant='ghost' className='flex items-center space-x-2'>
                                             {isOauthUser && (
-                                                <Image
+                                                <img
                                                     src={data.user.user_metadata.picture}
                                                     alt="avatar"
                                                     className="w-8 h-8 rounded-full"

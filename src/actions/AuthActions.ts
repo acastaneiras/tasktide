@@ -92,7 +92,7 @@ export async function logout() {
 }
 
 export async function loginWithGoogle() {
-    const url = window.location.origin
+    const url = process.env.NEXT_URL || 'http://localhost:3000'
     const supabase = createClient();
     const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',

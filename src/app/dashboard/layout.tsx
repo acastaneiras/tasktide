@@ -18,7 +18,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
     } else if (data?.user.app_metadata.providers.includes('google')) {
         isOauthUser = true
     }
-    console.log(data.user.user_metadata)
+
     return (
         <AdminPanelLayout>
             <main className='overflow-hidden bg-background h-full'>

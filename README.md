@@ -21,7 +21,7 @@ If you want to run this yourself you can do it like so:
 
 1. **Clone the Repository**:
    ```bash
-   git clone https://github.com/your-username/tasktide.git
+   git clone https://github.com/acastaneiras/tasktide.git
    cd tasktide
    ```
 2. **Set Up Environment Variables**: 
